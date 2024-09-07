@@ -37,6 +37,7 @@
 	"type": "module",
 	"dependencies": {
 		"@hkaspy/joystick-linux": "^1.2.0",
-		"pca9685": "^5.0.0"
+		"@types/i2c-bus": "^5.1.2",
+		"i2c-bus": "^5.2.3"
 	}
 }
