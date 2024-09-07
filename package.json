@@ -34,5 +34,9 @@
 		"vite": "^5.0.3",
 		"vitest": "^2.0.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@hkaspy/joystick-linux": "^1.2.0",
+		"pca9685": "^5.0.0"
+	}
 }
