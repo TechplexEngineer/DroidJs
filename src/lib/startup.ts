@@ -33,7 +33,10 @@ export const startup = async () => {
 
 	await pca.init();
 
+	await pca.setPWMFreq(50);
+
 	const pwm = new PwmMotorController(pca);
+	
 
 	setInterval(() => {
 		const { left: l, right: r } = polarSteering(
