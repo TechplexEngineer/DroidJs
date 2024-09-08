@@ -3,13 +3,18 @@ import { LogitechF310Mapper } from './controllers/logitech-f310';
 import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
 import { PCA9685 } from './motion/pwm';
-import { PwmMotorController } from './motion/servo';
+import { PwmMotorController, ServoController } from './motion/servo';
 import { applyDeadband, mapRange } from './utils/math';
 
 import i2cBus from 'i2c-bus';
 
 const deadband = 0.01;
 const maxSpeed = 0.2;
+
+const PortMapping = {
+	leftMotor: 0,
+	rightMotor: 1
+}
 
 export const startup = async () => {
 	console.log('Startup');
@@ -36,18 +41,44 @@ export const startup = async () => {
 	await pca.setPWMFreq(50);
 
 	const pwm = new PwmMotorController(pca);
+
+	const servo = new ServoController(pca);
+
+	let setpoint = 160;
+
+	js.on('A', (ev) => {
+		servo.setAngle(4, setpoint);
+	});
+	js.on('B', (ev) => {
+		servo.setAngle(4, 0);
+	});
+
+	js.on('X', (ev) => {
+		setpoint += 1;
+		servo.setAngle(4, setpoint);
+		console.log('Setpoint:', setpoint);
+	});
+	js.on('Y', (ev) => {
+		setpoint -= 1;
+		servo.setAngle(4, setpoint);
+		console.log('Setpoint:', setpoint);
+	});
 	
 
 	setInterval(() => {
+		// Driving
 		const { left: l, right: r } = polarSteering(
 			applyDeadband(js.getAxisByName('LEFT_STICK_Y'), deadband),
-			applyDeadband(js.getAxisByName('RIGHT_STICK_X'), 0.01)
+			applyDeadband(js.getAxisByName('LEFT_STICK_X'), deadband)
 		);
 		const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
 		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
-		console.log('Left:', left, 'Right:', right);
+		// console.log('Left:', left, 'Right:', right);
 
-		pwm.setSpeed(0, left);
-		pwm.setSpeed(1, right);
+		pwm.setSpeed(PortMapping.leftMotor, left);
+		pwm.setSpeed(PortMapping.rightMotor, right);
+
+		
+
 	}, 1 * 250);
 };

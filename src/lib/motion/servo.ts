@@ -1,20 +1,39 @@
 import { clamp, mapRange } from '$lib/utils/math';
 import type { PwmOutput } from './pwm';
 
-// export class Servo {
-// 	range: number;
-// 	minPulseWidth: number;
-// 	maxPulseWidth: number;
+export class ServoController {
+	pwmControllerOutput: PwmOutput;
+	minPulseUs: number;
+	maxPulseUs: number;
+	frequencyHz: number;
+	minAngle: number;
+	maxAngle: number;
 
-// 	constructor(range = 180, minPulseWidth = 750, maxPulseWidth = 2250) {
-// 		this.range = range;
-// 		this.minPulseWidth = minPulseWidth;
-// 		this.maxPulseWidth = maxPulseWidth;
-// 	}
+	constructor(pwmOut: PwmOutput, minPulseUs = 750, maxPulseUs = 2250, frequencyHz = 50, minAngle = 0, maxAngle = 180) {
+		this.pwmControllerOutput = pwmOut;
+		this.minPulseUs = minPulseUs;
+		this.maxPulseUs = maxPulseUs;
+		this.frequencyHz = frequencyHz;
+		this.minAngle = minAngle;
+		this.maxAngle = maxAngle;
+	}
 
-// 	getAngle() {}
-// 	setAngle() {}
-// }
+	setAngle(channel: number, angle: number) {
+		// angle = clamp(angle, this.minAngle, this.maxAngle); // not sure if we should do this?
+
+		const pulseWidth = mapRange(angle, this.minAngle, this.maxAngle, this.minPulseUs, this.maxPulseUs);
+
+		const usPerSecond = 1_000_000;
+		const oneCycleUs = usPerSecond / this.frequencyHz;
+
+		const pca9685Min = 0;
+		const pca9685Max = 4095;
+		const onTime = 0;
+		const offTime = mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max);
+
+		this.pwmControllerOutput.setPWM(channel, onTime, offTime);
+	}
+}
 
 export class PwmMotorController {
 	pwmControllerOutput: PwmOutput;
@@ -38,8 +57,10 @@ export class PwmMotorController {
 		const usPerSecond = 1_000_000;
 		const oneCycleUs = usPerSecond / this.frequencyHz;
 
+		const pca9685Min = 0;
+		const pca9685Max = 4095;
 		const onTime = 0;
-		const offTime = mapRange(pulseWidth, 0, oneCycleUs, 0, 4095);
+		const offTime = mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max);
 
 		this.pwmControllerOutput.setPWM(channel, onTime, offTime);
 	}
