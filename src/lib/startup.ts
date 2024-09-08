@@ -4,6 +4,7 @@ import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
 import { PCA9685 } from './motion/pwm';
 import { PwmMotorController, ServoController } from './motion/servo';
+import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
 import { spawn } from 'child_process';
 
@@ -42,11 +43,11 @@ export const startup = async () => {
 
 	await pca.setPWMFreq(50);
 
-	const pwm = new PwmMotorController(pca);
+	const motor = new PwmMotorController(pca);
 
 	const servo = new ServoController(pca);
 
-	let setpoint = 160;
+	// let setpoint = 160;
 
 	// js.on('A', (ev) => {
 	// 	servo.setAngle(4, setpoint);
@@ -77,50 +78,31 @@ export const startup = async () => {
 		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
 		// console.log('Left:', left, 'Right:', right);
 
-		pwm.setSpeed(PortMapping.leftMotor, left);
-		pwm.setSpeed(PortMapping.rightMotor, right);
+		motor.setSpeed(PortMapping.leftMotor, left);
+		motor.setSpeed(PortMapping.rightMotor, right);
 
 		// Dome
 		const dome = applyDeadband(js.getAxisByName('RIGHT_STICK_X'), deadband);
-		pwm.setSpeed(PortMapping.dome, dome);
+		motor.setSpeed(PortMapping.dome, dome);
 
 	}, 1 * 250);
 
-	// var player = new soundplayer({filename: "/home/pi/r2_control/HUM__014.mp3", debug:true, player: "mpg123"})
-	js.on('Y', (ev) => {
+	
+	const player = new SoundPlayer("/home/pi/r2_control/sounds/")
+
+	js.on('X', (ev) => {
 		if (ev.value !== 1) return; // dont play when button released
 
-		console.log('Playing sound', ev);
-		const process = spawn('mpg321', ["-q", "/home/pi/r2_control/sounds/HUM__014.mp3", '-g', "50"]);
-
-		let stdOut: string[] = [];
-		let stdErr: string[] = [];
-
-		process.stdout.on('data', (data) => {
-    		stdOut.push(data);
-		});
-
-		process.stderr.on('data', (data) => {
-    		stdErr.push(data);
-		});
-
-		process.on('close', (code) => {
-			if (code !== 0) {
-				console.log(`child process exited with code ${code}`);
-				console.log(stdOut.join('\n'));
-				console.error(stdErr.join('\n'));
-			}
-		//   console.log(`child process exited with code ${code}`);
-		}); 
-
-		console.log('sound.js started');
-		// console.log('Playing sound');
-		// player.play();
-		// spawn('mpg321', ["/home/pi/r2_control/HUM__014.mp3", '-g', "50"]); //, '-a', this.options.device
+		player.playSound("HUM__014.mp3");
 	});
 
+	
+
 
 	
-	
-	
+	return {
+		soundPlayer: player,
+		motorController: motor,
+		servoController: servo,
+	}
 };
