@@ -13,7 +13,8 @@ const maxSpeed = 0.2;
 
 const PortMapping = {
 	leftMotor: 0,
-	rightMotor: 1
+	rightMotor: 1,
+	dome: 3,
 }
 
 export const startup = async () => {
@@ -78,7 +79,9 @@ export const startup = async () => {
 		pwm.setSpeed(PortMapping.leftMotor, left);
 		pwm.setSpeed(PortMapping.rightMotor, right);
 
-		
+		// Dome
+		const dome = applyDeadband(js.getAxisByName('RIGHT_STICK_X'), deadband);
+		pwm.setSpeed(PortMapping.dome, dome);
 
 	}, 1 * 250);
 };
