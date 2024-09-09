@@ -1,23 +1,30 @@
 import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 
+const isMac = os.type() === 'Darwin' || os.type().indexOf('Windows') > -1;
 
 export class SoundPlayer {
     soundDirectory: string;
     process: ChildProcessWithoutNullStreams | null = null
 
-    // /home/pi/r2_control/sounds/
+    //eg. /home/pi/r2_control/sounds/
     constructor(soundDirectory: string) {
         this.soundDirectory = soundDirectory;
     }
 
     // HUM__014.mp3
-    async playSound(filename: string, volume=50) {
-        new Promise<void>((resolve, reject) => {            
+    async playSound(filename: string, volume = 50) {
+        return new Promise<void>((resolve, reject) => {
             this.stop();
 
-            this.process = spawn('mpg321', ["-q", path.join(this.soundDirectory, filename), '-g', `${volume}`]);
+            const filePath = path.join(this.soundDirectory, filename);
+            if (!isMac) {
+                this.process = spawn('mpg321', ["-q", filePath, '-g', `${volume}`]);
+            } else {
+                this.process = spawn('afplay', [filePath, '-v', `${volume}`]);
+            }
 
             let stdOut: string[] = [];
             let stdErr: string[] = [];
@@ -36,12 +43,20 @@ export class SoundPlayer {
                     console.log(stdOut.join('\n'));
                     console.error(stdErr.join('\n'));
                 }
+
                 this.process = null;
                 resolve();
-            }); 
-        })
+            });
 
+            this.process.on('error', (err) => {
+                console.log('Error playing file ' + err);
+
+                this.process = null;
+                resolve();
+            });
+        });
     }
+
     stop() {
         if (this.process !== null) {
             this.process.kill('SIGTERM');
@@ -50,7 +65,8 @@ export class SoundPlayer {
     }
 
     async listSounds() {
-        return fs.readdir(this.soundDirectory);
+        const listing = await fs.readdir(this.soundDirectory, { recursive: true });
+        return listing.filter((file) => file.endsWith('.mp3'));
     }
-    
+
 }
