@@ -1,5 +1,6 @@
 import Joystick from '$lib/joystick-linux';
 import { LogitechF310Mapper } from './controllers/logitech-f310';
+import { fileDb } from './db/jsondb';
 import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
 import { PCA9685 } from './motion/pwm';
@@ -104,12 +105,10 @@ export const startup = async () => {
 	});
 
 
-
-
-
 	return {
 		soundPlayer: player,
 		motorController: motor,
 		servoController: servo,
+		db: new fileDb('./config.json')
 	}
 };

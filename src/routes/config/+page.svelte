@@ -47,4 +47,22 @@
 	</tbody>
 </table>
 
-<Modal show={showAddHardwareModal} title="Add Hardware" callback={addHardware} />
+<Modal show={showAddHardwareModal} title="Add Hardware" callback={addHardware}>
+	<form>
+		<div class="mb-3">
+			<label for="name" class="form-label">Name</label>
+			<input type="text" class="form-control" id="name" />
+		</div>
+		<div class="mb-3">
+			<label for="type" class="form-label">Type</label>
+			<select class="form-select" id="type">
+				<option value="audio">Audio</option>
+				<option value="video">Video</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label for="config" class="form-label">Config</label>
+			<textarea class="form-control" id="config"></textarea>
+		</div>
+	</form>
+</Modal>
