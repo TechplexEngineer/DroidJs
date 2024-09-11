@@ -22,6 +22,8 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/bootstrap": "^5.2.10",
 		"@types/eslint": "^9.6.0",
+		"@types/papaparse": "^5.3.14",
+		"@vitest/coverage-v8": "^2.0.5",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
@@ -37,10 +39,10 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@hkaspy/joystick-linux": "^1.2.0",
 		"@types/i2c-bus": "^5.1.2",
 		"bootstrap": "^5.3.3",
 		"i2c-bus": "^5.2.3",
+		"papaparse": "^5.4.1",
 		"sass": "1.77.6"
 	}
 }

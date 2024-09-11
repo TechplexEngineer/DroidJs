@@ -1,8 +1,9 @@
-import Joystick from '$lib/joystick-linux';
+import { Joystick } from '$lib/joystick-linux/joystick';
 import { LogitechF310Mapper } from './controllers/logitech-f310';
 import { fileDb } from './db/jsondb';
 import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
+import { Astropixels } from './lights/astropixels';
 import { PCA9685 } from './motion/pwm';
 import { PwmMotorController, ServoController } from './motion/servo';
 import { SoundPlayer } from './sound/player';
@@ -53,6 +54,8 @@ export const startup = async () => {
 	const motor = new PwmMotorController(pca);
 
 	const servo = new ServoController(pca);
+
+	const astropixels = new Astropixels(con);
 
 
 	// let setpoint = 160;
