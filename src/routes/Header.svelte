@@ -51,14 +51,6 @@
 		height: 6em;
 	}
 
-	.corner a {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-	}
-
 	.corner img {
 		width: 10em;
 		height: 4em;

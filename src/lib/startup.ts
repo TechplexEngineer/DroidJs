@@ -1,6 +1,7 @@
 import { Joystick } from '$lib/joystick-linux/joystick';
 import { LogitechF310Mapper } from './controllers/logitech-f310';
-import { fileDb } from './db/jsondb';
+import { ConfigDb } from './db/configDb';
+import { FileDb } from './db/jsondb';
 import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
 import { Astropixels } from './lights/astropixels';
@@ -20,6 +21,13 @@ const PortMapping = {
 	leftMotor: 0,
 	rightMotor: 1,
 	dome: 3,
+}
+
+if (import.meta.hot) {
+	console.log('Hot reload enabled');
+	import.meta.hot.accept(() => {
+		console.log('reload!');
+	});
 }
 
 export const startup = async () => {
@@ -56,6 +64,18 @@ export const startup = async () => {
 	const servo = new ServoController(pca);
 
 	const astropixels = new Astropixels(con);
+
+	const filedb = new FileDb('./config.json');
+	const configDb = new ConfigDb(filedb);
+
+	// at startup set all servos to home pos
+	const servos = await configDb.getServos();
+	console.log('Servos:', servos);
+
+	for (const { name, channel, homePos } of servos) {
+		servo.setAngle(channel, homePos ?? 0);
+	}
+
 
 
 	// let setpoint = 160;
@@ -112,6 +132,6 @@ export const startup = async () => {
 		soundPlayer: player,
 		motorController: motor,
 		servoController: servo,
-		db: new fileDb('./config.json')
+		db: filedb
 	}
 };

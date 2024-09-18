@@ -1,12 +1,12 @@
 import type { ServoController } from "$lib/motion/servo";
-import { configDb } from "$lib/db/configDb"
+import { ConfigDb } from "$lib/db/configDb"
 import type { Handler } from "./iHandler";
 
 export class ServoHandler implements Handler {
     private servoController: ServoController;
-    private config: configDb;
+    private config: ConfigDb;
 
-    constructor(servoController: ServoController, config: configDb) {
+    constructor(servoController: ServoController, config: ConfigDb) {
         this.servoController = servoController;
         this.config = config;
     }

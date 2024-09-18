@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fileDb } from './jsondb';
+import { FileDb } from './jsondb';
 import fs from 'fs/promises';
 
 
@@ -11,7 +11,7 @@ describe('fileDb', () => {
     });
 
     it('should create the file if it does not exist', async () => {
-        const db = new fileDb(filePath);
+        const db = new FileDb(filePath);
         const data = await db.read();
         expect(data).toEqual({});
     });
@@ -21,7 +21,7 @@ describe('fileDb', () => {
         await fs.writeFile(filePath, JSON.stringify(initialData));
         console.log(JSON.parse(await fs.readFile(filePath, 'utf-8')));
 
-        const db = new fileDb(filePath);
+        const db = new FileDb(filePath);
 
         const data = await db.read();
         expect(data).toEqual(initialData);
@@ -31,7 +31,7 @@ describe('fileDb', () => {
         const initialData = { key: 'value' };
         await fs.writeFile(filePath, JSON.stringify(initialData));
 
-        const db = new fileDb(filePath);
+        const db = new FileDb(filePath);
         const updatedData = { key: 'newValue' };
 
 

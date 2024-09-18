@@ -7,9 +7,6 @@
 	let showAddHwModal = false;
 
 	let hwTypeValue = '';
-	$: console.log('hwTypeValue', hwTypeValue);
-
-	$: console.log('showAddHardwareModal', showAddHwModal);
 </script>
 
 <div class="d-flex justify-content-between">

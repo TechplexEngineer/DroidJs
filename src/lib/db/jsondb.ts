@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 
-export class fileDb {
+export class FileDb {
     private filePath: string
     constructor(filePath: string) {
         this.filePath = filePath;

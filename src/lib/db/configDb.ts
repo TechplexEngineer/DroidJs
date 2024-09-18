@@ -1,22 +1,25 @@
-import type { fileDb } from "./jsondb";
+import type { FileDb } from "./jsondb";
 
-export type servoParams = {
+
+export type servoConfig = {
+    name: string,
+    hardware: string,
+    channel: number,
     // minPos: number,
     // maxPos: number,
-    // homePos: number
-    channel: number
-}
-export type servoConfig = Record<string, servoParams>;
+    homePos: number
 
-export class configDb {
-    private db: fileDb;
+}[];
 
-    constructor(db: fileDb) {
+export class ConfigDb {
+    private db: FileDb;
+
+    constructor(db: FileDb) {
         this.db = db;
     }
 
     async getServos(): Promise<servoConfig> {
         const data = await this.db.read()
-        return data['servos'] as servoConfig
+        return data['servos'] as servoConfig || {};
     }
 }
