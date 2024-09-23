@@ -1,8 +1,33 @@
 import * as fs from 'fs/promises';
+import {
+	getAxisMap,
+	getButtonMap,
+	getDeviceName,
+	getNumAxes,
+	getNumButtons
+} from './joystick-ioctl';
 
 export const listJoysticks = async () => {
 	const devices = await fs.readdir('/dev/input');
 	const joysticks = devices.filter((d) => d.startsWith('js'));
+
+	return Promise.all(
+		joysticks.map(async (j) => {
+			const fh = await fs.open(`/dev/input/${j}`, 'r');
+
+			const data = {
+				number: parseInt(j.slice(2)),
+				path: `/dev/input/${j}`,
+				name: getDeviceName(fh.fd),
+				numButtons: getNumButtons(fh.fd),
+				numAxes: getNumAxes(fh.fd),
+				buttonMap: getButtonMap(fh.fd),
+				axisMap: getAxisMap(fh.fd)
+			};
+			fh.close();
+			return data;
+		})
+	);
 
 	// fs.open(DevicePath, 'r', function (err, fd) {
 	// 		if (err) {
