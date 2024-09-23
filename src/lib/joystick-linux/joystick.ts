@@ -112,6 +112,10 @@ export class Joystick extends EventEmitter<JsEvents> {
 		}
 	}
 
+	public close() {
+		this.fileHandle?.close();
+	}
+
 	public getDriverVersion() {
 		if (!this.fileHandle) {
 			throw new Error('File handle not initialized');

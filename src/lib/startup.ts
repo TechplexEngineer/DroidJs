@@ -37,7 +37,7 @@ export const startup = async () => {
 		console.log('Building, skipping hardware startup');
 		return {};
 	}
-	console.log('Startup', process.cwd());
+	console.log('Startup cwd:', process.cwd());
 
 	const stick = new Joystick('/dev/input/js0', { mappingFn: LogitechF310Mapper.eventMapper });
 	const js = new JoystickCache(stick, LogitechF310Mapper);
@@ -87,11 +87,6 @@ export const startup = async () => {
 	for (const { name, channel, homePos } of servos) {
 		servo.setAngle(channel, homePos ?? 0);
 	}
-
-
-	js.on('A', (ev) => {
-		stick.getNumberOfAxes();
-	});
 
 
 	// let setpoint = 160;
