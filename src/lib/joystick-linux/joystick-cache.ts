@@ -1,11 +1,15 @@
 import type { Joystick, JoystickMapper, jsEvent } from './joystick';
+import EventEmitter from 'events';
+
+type JsCacheEvents = Record<string, [jsEvent]>;
 
 // Store the values from the joystick to allow easier access
-export class JoystickCache {
+export class JoystickCache extends EventEmitter<JsCacheEvents> {
 	joystickCache: Record<string, any> = {};
 	mapper;
 
 	constructor(stick: Joystick, mapper: JoystickMapper) {
+		super();
 		this.joystickCache = {};
 		this.mapper = mapper;
 
@@ -19,6 +23,9 @@ export class JoystickCache {
 
 		stick.on('update', (ev) => {
 			this.add(ev);
+			if ('name' in ev) {
+				this.emit(`${ev.name}`, ev)
+			}
 		});
 	}
 

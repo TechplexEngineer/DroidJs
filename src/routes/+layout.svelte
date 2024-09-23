@@ -1,6 +1,23 @@
 <script>
-	import Header from './Header.svelte';
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 	import '../app.css';
+	import '../app.scss';
+	// import './styles.css';
+
+	import Header from './Header.svelte';
+
+	onMount(async () => {
+		if (!browser) return;
+
+		// this is enough for most components
+		await import('bootstrap');
+
+		// some components require a bootstrap instance, to fulfil their job. In that case, use this:
+		// const bootstrap = await import("bootstrap");
+		// sample usage:
+		// const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+	});
 </script>
 
 <div class="app">
@@ -11,7 +28,9 @@
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>
+			<a href="https://github.com/TechplexEngineer/DroidJs">DroidJS</a> - Droid Control Software
+		</p>
 	</footer>
 </div>
 

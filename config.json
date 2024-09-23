@@ -1,0 +1,46 @@
+{
+    "hardware": [
+        {
+            "type": "i2c: PCA9685: 16 Channel PWM Generator",
+            "name": "Body",
+            "config": {
+                "i2cAddress": "0x40",
+                "frequency": 50
+            }
+        },
+        {
+            "type": "i2c: PCA9685: 16 Channel PWM Generator",
+            "name": "Dome Servos",
+            "config": {
+                "i2cAddress": "0x41",
+                "frequency": 50
+            }
+        },
+        {
+            "type": "Serial: Astropixels",
+            "name": "Dome Lights",
+            "config": {
+                "bus": "/dev/ttyUSB0",
+                "baud": 9600
+            }
+        }
+    ],
+    "servos": [
+        {
+            "name": "Dome Servo 1",
+            "hardware": "Dome Servos",
+            "channel": 0,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },
+        {
+            "name": "Dome Servo 2",
+            "hardware": "Dome Servos",
+            "channel": 1,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        }
+    ]
+}
