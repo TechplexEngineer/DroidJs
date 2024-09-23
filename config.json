@@ -29,7 +29,7 @@
         {
             "name": "Dome Servo 1",
             "hardware": "Dome Servos",
-            "channel": 0,
+            "channel": 4,
             "min": 0,
             "max": 120,
             "home": 0
@@ -37,7 +37,7 @@
         {
             "name": "Dome Servo 2",
             "hardware": "Dome Servos",
-            "channel": 1,
+            "channel": 5,
             "min": 0,
             "max": 120,
             "home": 0

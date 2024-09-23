@@ -9,8 +9,10 @@ import { PCA9685 } from './motion/pwm';
 import { PwmMotorController, ServoController } from './motion/servo';
 import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
+import { browser, building, dev, version } from '$app/environment';
+import os from 'os';
 
-const isRaspberryPi = process.arch === 'arm';
+const isRaspberryPi = os.arch() === 'arm64' && os.platform() === 'linux';
 console.log('Is Raspberry Pi:', isRaspberryPi);
 
 
@@ -31,6 +33,10 @@ if (import.meta.hot) {
 }
 
 export const startup = async () => {
+	if (building) {
+		console.log('Building, skipping hardware startup');
+		return {};
+	}
 	console.log('Startup', process.cwd());
 
 	const stick = new Joystick('/dev/input/js0', { mappingFn: LogitechF310Mapper.eventMapper });
@@ -65,7 +71,13 @@ export const startup = async () => {
 
 	const astropixels = new Astropixels(con);
 
-	const filedb = new FileDb('./config.json');
+	let configFilePath = './config.json';
+	if (process.env.NODE_ENV === 'production') {
+		console.log('Running in production mode');
+		configFilePath = '/home/pi/DroidJs/config.json';
+	}
+
+	const filedb = new FileDb(configFilePath);
 	const configDb = new ConfigDb(filedb);
 
 	// at startup set all servos to home pos
@@ -76,6 +88,10 @@ export const startup = async () => {
 		servo.setAngle(channel, homePos ?? 0);
 	}
 
+
+	js.on('A', (ev) => {
+		stick.getNumberOfAxes();
+	});
 
 
 	// let setpoint = 160;
@@ -109,7 +125,7 @@ export const startup = async () => {
 		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
 		// console.log('Left:', left, 'Right:', right);
 
-		motor.setSpeed(PortMapping.leftMotor, left);
+		motor.setSpeed(PortMapping.leftMotor, -left);
 		motor.setSpeed(PortMapping.rightMotor, right);
 
 		// Dome
@@ -119,12 +135,17 @@ export const startup = async () => {
 	}, 1 * 250);
 
 
-	const player = new SoundPlayer("./sounds")
+	let soundDirPath = "./sounds";
+	if (process.env.NODE_ENV === 'production') {
+		soundDirPath = '/home/pi/DroidJs/sounds';
+	}
+
+	const player = new SoundPlayer(soundDirPath)
 
 	js.on('X', (ev) => {
 		if (ev.value !== 1) return; // dont play when button released
 
-		player.playSound("HUM__014.mp3");
+		player.playSound("HUM/HUM__014.mp3");
 	});
 
 

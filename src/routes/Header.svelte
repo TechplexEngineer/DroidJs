@@ -4,7 +4,7 @@
 
 <header>
 	<div class="corner">
-		<img src="images/DroidJsLogo.svg" alt="SvelteKit" />
+		<img src="/images/DroidJsLogo.svg" alt="SvelteKit" />
 	</div>
 
 	<nav>
