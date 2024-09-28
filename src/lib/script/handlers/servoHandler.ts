@@ -1,5 +1,6 @@
-import type { ServoController } from "$lib/motion/servo";
+
 import { ConfigDb } from "$lib/db/configDb"
+import type { ServoController } from "$lib/motion/servoController";
 import type { Handler } from "./iHandler";
 
 export class ServoHandler implements Handler {
@@ -16,7 +17,7 @@ export class ServoHandler implements Handler {
             console.log('Invalid servo arguments, must have servo number and angle');
             return;
         }
-        const servoName = args[0];
+        const servoName = args[0] as string;
         const angle = parseInt(args[1]);
         if (isNaN(angle)) {
             console.log('Invalid servo arguments, servo number and angle must be numbers');

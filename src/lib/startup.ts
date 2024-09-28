@@ -6,7 +6,8 @@ import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
 import { Astropixels } from './lights/astropixels';
 import { PCA9685 } from './motion/pwm';
-import { PwmMotorController, ServoController } from './motion/servo';
+import { PwmMotorController } from './motion/pwmMotor';
+import { ServoController } from './motion/servoController';
 import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
 
@@ -57,7 +58,7 @@ export const startup = async () => {
 
 	await pca.init();
 
-	await pca.setPWMFreq(50); //Seen others set this to 60
+	await pca.setPWMFreq(60); //Seen others set this to 60, should be 50 per spark datasheet
 
 	const motor = new PwmMotorController(pca);
 
