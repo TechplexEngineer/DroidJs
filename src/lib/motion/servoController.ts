@@ -20,14 +20,14 @@ export class ServoController { //need a unique one of these for each pwmControll
 		this.maxAngle = maxAngle;
 	}
 
-	setAngle(channel: number, angle: number, allowOutOfBounds = false) {
+	setAngle(channel: number, targetAngle: number, allowOutOfBounds = false) {
 		if (!allowOutOfBounds) {
-			angle = clamp(angle, this.minAngle, this.maxAngle);
+			targetAngle = clamp(targetAngle, this.minAngle, this.maxAngle);
 		}
+		const startingAngle = this.servoLocationCache.get(channel) || 0;
+		this.servoLocationCache.set(channel, targetAngle);
 
-		this.servoLocationCache.set(channel, angle);
-
-		const pulseWidth = mapRange(angle, this.minAngle, this.maxAngle, this.minPulseUs, this.maxPulseUs);
+		const pulseWidth = mapRange(targetAngle, this.minAngle, this.maxAngle, this.minPulseUs, this.maxPulseUs);
 
 		const usPerSecond = 1_000_000;
 		const oneCycleUs = usPerSecond / this.frequencyHz;
@@ -38,7 +38,18 @@ export class ServoController { //need a unique one of these for each pwmControll
 		const offTime = mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max);
 
 		this.pwmControllerOutput.setPWM(channel, onTime, offTime);
+
+		// disable the servo after it has moved
+		// per sparkfun: the servo can move 60° at a speed of .16 seconds with no load
+		// https://www.sparkfun.com/servos
+		const waitTimeMs = Math.abs(startingAngle - targetAngle) / 60 * .16 * 1000;
+		setTimeout(() => {
+			this.disable(channel);
+		}, waitTimeMs); //wait for the servo to move //@todo not sure how to determine this number
+
 	}
+
+	//.16 sec to miliseconds
 
 	setAngleSlow(channel: number, targetAngle: number, timeMs: number) {
 		const startTime = Date.now(); //time in ms
@@ -54,9 +65,14 @@ export class ServoController { //need a unique one of these for each pwmControll
 
 			if (progress >= 1) {
 				clearInterval(id); //is id this properly captured by the closure?
+				this.disable(channel);
 			}
 
 		}, 50); //move in 50ms steps
+	}
+
+	disable(channel: number) {
+		this.pwmControllerOutput.setPWM(channel, 0, 0);
 	}
 }
 
