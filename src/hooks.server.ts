@@ -2,7 +2,10 @@ import { building } from '$app/environment';
 import { startup } from '$lib/startup';
 import type { Handle } from '@sveltejs/kit';
 
-
+process.on('sveltekit:shutdown', async (reason) => {
+  console.log('sveltekit:shutdown');
+  process.exit(0);
+});
 
 let startupPromise = startup();
 

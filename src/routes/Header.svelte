@@ -4,7 +4,7 @@
 
 <header>
 	<div class="corner">
-		<img src="images/DroidJsLogo.svg" alt="SvelteKit" />
+		<img src="/images/DroidJsLogo.svg" alt="SvelteKit" />
 	</div>
 
 	<nav>
@@ -26,6 +26,9 @@
 			</li>
 			<li aria-current={$page.url.pathname.startsWith('/config') ? 'page' : undefined}>
 				<a href="/config">Config</a>
+			</li>
+			<li aria-current={$page.url.pathname.startsWith('/joystick') ? 'page' : undefined}>
+				<a href="/joystick">Joystick</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">

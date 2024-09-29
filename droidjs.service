@@ -1,0 +1,17 @@
+# Install to /etc/systemd/system/droidjs.service
+
+[Unit]
+Description=DroidJS Droid Control Software
+Documentation=https://github.com/TechplexEngineer/DroidJs
+After=network.target
+
+[Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Environment=NODE_ENV=production SHUTDOWN_TIMEOUT=0 PORT=80
+# Type=simple
+User=pi
+ExecStart=/home/pi/.nvm/versions/node/v20.17.0/bin/node /home/pi/DroidJs/build
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

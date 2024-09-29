@@ -49,7 +49,7 @@ export class SoundPlayer {
             });
 
             this.process.on('error', (err) => {
-                console.log('Error playing file ' + err);
+                console.log(`Error playing '${filePath}'` + err);
 
                 this.process = null;
                 resolve();

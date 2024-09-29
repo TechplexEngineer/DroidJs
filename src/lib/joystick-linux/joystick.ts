@@ -2,6 +2,16 @@ import EventEmitter from 'events';
 import { createReadStream } from 'fs';
 import { JoystickStream } from './joystick-stream.js';
 import { parseEvent } from './parseEvent.js';
+import * as fs from 'node:fs/promises';
+import ioctl from 'ioctl';
+import {
+	getAxisMap,
+	getButtonMap,
+	getDeviceName,
+	getDriverVersion,
+	getNumAxes,
+	getNumButtons
+} from './joystick-ioctl.js';
 
 export interface namedJsEvent extends jsEvent {
 	name: string;
@@ -42,6 +52,7 @@ interface JsEvents {
 export class Joystick extends EventEmitter<JsEvents> {
 	mappingFn;
 	includeInit;
+	fileHandle: fs.FileHandle | undefined = undefined;
 
 	/**
 	 *
@@ -58,9 +69,11 @@ export class Joystick extends EventEmitter<JsEvents> {
 		this.initReadStream(devicePath);
 	}
 
-	private initReadStream(devicePath: string) {
+	private async initReadStream(devicePath: string) {
 		try {
-			const fileStream = createReadStream(devicePath);
+			this.fileHandle = await fs.open(devicePath);
+
+			const fileStream = createReadStream('IGNORED', { fd: this.fileHandle.fd });
 			fileStream.on('error', (e) => {
 				if ((e as any).code === 'ENODEV') {
 					this.emit('disconnect');
@@ -76,6 +89,7 @@ export class Joystick extends EventEmitter<JsEvents> {
 			fileStream.pipe(new JoystickStream()).on('data', (b) => this.onData(b));
 		} catch (error) {
 			console.log('error tc', error);
+			this.fileHandle?.close();
 		}
 	}
 
@@ -96,5 +110,46 @@ export class Joystick extends EventEmitter<JsEvents> {
 		} else {
 			this.emit('update', ev);
 		}
+	}
+
+	public close() {
+		this.fileHandle?.close();
+	}
+
+	public getDriverVersion() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getDriverVersion(this.fileHandle.fd);
+	}
+	public getNumAxes() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getNumAxes(this.fileHandle.fd);
+	}
+	public getNumButtons() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getNumButtons(this.fileHandle.fd);
+	}
+	public getDeviceName() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getDeviceName(this.fileHandle.fd);
+	}
+	public getAxisMap() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getAxisMap(this.fileHandle.fd);
+	}
+	public getButtonMap() {
+		if (!this.fileHandle) {
+			throw new Error('File handle not initialized');
+		}
+		return getButtonMap(this.fileHandle.fd);
 	}
 }

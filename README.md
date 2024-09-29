@@ -1,3 +1,25 @@
+
+
+## Notes:
+Tested on Debian Bookwork 12 - Raspbian Lite
+Install mpg123 media player `sudo apt-get install mpg123 -y`
+sudo apt install -y i2c-tools
+
+`sudo ln -s droidjs.service /etc/systemd/system/droidjs.service`
+`sudo ln -s droidjs.socket /etc/systemd/system/droidjs.socket`
+sudo systemctl daemon-reload
+sudo systemctl start droidjs
+
+`sudo cp droidjs.service /etc/systemd/system/droidjs.service`
+sudo systemctl daemon-reload
+sudo systemctl enable droidjs
+sudo systemctl start droidjs
+
+i2c bus not working by default
+raspi-config > Interface Options > I2C
+
+
+# What follows is the original readme from create-svelte
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
