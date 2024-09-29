@@ -4,8 +4,6 @@ import { produce } from 'sveltekit-sse';
 
 export function POST({ params }) {
 	return produce(async function start({ emit }) {
-		console.log('params', params.jsid);
-
 		const js = new Joystick(`/dev/input/${params.jsid}`);
 		js.on('update', (data) => {
 			emit('message', JSON.stringify(data));
