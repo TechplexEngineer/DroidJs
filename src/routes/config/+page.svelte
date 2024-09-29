@@ -57,7 +57,8 @@
 					<option value="i2c:PCA9685:16"> i2c: PCA9685: 16 Channel PWM Generator</option>
 				</optgroup>
 				<optgroup label="Joystick">
-					<option value="js:logitechf310">USB: Joystick: logitechf310</option>
+					<option value="js:logitech-f310">USB: Joystick: Logitech F-310</option>
+					<option value="js:psmove-nav">USB: Joystick: Playstation Move Navigation</option>
 				</optgroup>
 			</select>
 		</div>
