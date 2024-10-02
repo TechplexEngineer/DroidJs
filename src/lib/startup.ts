@@ -12,6 +12,7 @@ import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
 import { browser, building, dev, version } from '$app/environment';
 import os from 'os';
+import { ScriptRunnerManager } from './script/ScriptRunnerManager';
 
 const isRaspberryPi = os.arch() === 'arm64' && os.platform() === 'linux';
 console.log('Is Raspberry Pi:', isRaspberryPi);
@@ -33,11 +34,8 @@ if (import.meta.hot) {
 	});
 }
 
-export const startup = async () => {
-	if (building) {
-		console.log('Building, skipping hardware startup');
-		return {};
-	}
+export const startup = async (): Promise<App.Locals> => {
+	
 	console.log('Startup cwd:', process.cwd());
 
 	const stick = new Joystick('/dev/input/js0', { mappingFn: LogitechF310Mapper.eventMapper });
@@ -133,7 +131,7 @@ export const startup = async () => {
 
 	let soundDirPath = "./sounds";
 	if (process.env.NODE_ENV === 'production') {
-		soundDirPath = '/home/pi/DroidJs/sounds';
+		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
 	}
 
 	const player = new SoundPlayer(soundDirPath)
@@ -144,11 +142,20 @@ export const startup = async () => {
 		player.playSound("HUM/HUM__014.mp3");
 	});
 
+	let scriptDirPath = "./scripts";
+	if (process.env.NODE_ENV === 'production') {
+		scriptDirPath = '/home/pi/DroidJs/scripts'; //@todo don't hardcode this, get from config
+	}
+
+	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {});
+
 
 	return {
 		soundPlayer: player,
-		motorController: motor,
-		servoController: servo,
-		db: filedb
+		scriptMgr: scriptMgr,
+		db: filedb,
+		// motorController: motor,
+		// servoController: servo,
+		
 	}
 };

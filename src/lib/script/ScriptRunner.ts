@@ -9,6 +9,7 @@ export type ScriptHandlers = Record<string, ScriptHandler>;
 export class ScriptRunner {
     private scriptPath: string;
     private handlers: ScriptHandlers;
+    private isStopping = false;
 
 
     constructor(scriptPath: string, handlers: ScriptHandlers) {
@@ -25,13 +26,21 @@ export class ScriptRunner {
         });
 
         for await (const csvLine of rl) {
+            if(this.isStopping) {
+                break; //todo this will not interrupt a playing sound
+            }
             const line = Papa.parse<string[]>(csvLine, { comments: '#' });
             if (line.data.length === 0) {
                 console.log('Skipping line: ', csvLine);
                 continue;
             }
             await this.processLine(line.data[0]);
+            
         }
+    }
+
+    stop() {
+        this.isStopping = true;
     }
 
     private async processLine(line: string[]): Promise<void> {

@@ -10,9 +10,11 @@ process.on('sveltekit:shutdown', async (reason) => {
 let startupPromise = startup();
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const { soundPlayer, db } = await startupPromise;
-	event.locals.soundPlayer = soundPlayer;
-	event.locals.db = db;
+	if (building) {
+		console.log('Building, skipping hardware startup');
+	} else {
+		event.locals = await startupPromise;
+	}
 
 	const response = await resolve(event);
 	return response;
