@@ -24,8 +24,8 @@
 			<li aria-current={$page.url.pathname.startsWith('/config') ? 'page' : undefined}>
 				<a href="/config">Config</a>
 			</li>
-			<li aria-current={$page.url.pathname.startsWith('/joystick') ? 'page' : undefined}>
-				<a href="/joystick">Joystick</a>
+			<li aria-current={$page.url.pathname.startsWith('/controller') ? 'page' : undefined}>
+				<a href="/controller">Controller</a>
 			</li>
 			<li aria-current={$page.url.pathname.startsWith('/script') ? 'page' : undefined}>
 				<a href="/script">Script</a>

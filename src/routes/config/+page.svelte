@@ -9,6 +9,11 @@
 	let hwTypeValue = '';
 </script>
 
+<svelte:head>
+	<title>Config :: DroidJs</title>
+	<meta name="description" content="Configure your Droid with DroidJs Droid Control Software" />
+</svelte:head>
+
 <div class="d-flex justify-content-between">
 	<div></div>
 	<h1>Hardware Config</h1>

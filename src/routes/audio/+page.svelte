@@ -5,6 +5,11 @@
 	export let data: PageData;
 </script>
 
+<svelte:head>
+	<title>Audio :: DroidJs</title>
+	<meta name="description" content="Make your droid speak DroidJs Droid Control Software" />
+</svelte:head>
+
 <form method="POST" action="?/stop" use:enhance>
 	<button type="submit" class="btn btn-danger">Stop</button>
 </form>

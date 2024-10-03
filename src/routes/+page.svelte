@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Home :: DroidJs</title>
+	<meta name="description" content="Dashboard for DroidJs Droid Control Software" />
 </svelte:head>
 
 <section>
