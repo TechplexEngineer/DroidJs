@@ -16,7 +16,6 @@ export class PwmMotorController {
 
     // speed is a number between -1 and 1
     setSpeed(channel: number, speed: number) {
-        console.log('setSpeed', channel, speed);
         speed = clamp(speed, -1, 1);
 
         const pulseWidth = mapRange(speed, -1, 1, this.minPulseUs, this.maxPulseUs);

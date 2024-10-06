@@ -4,7 +4,7 @@ import type { Handle } from '@sveltejs/kit';
 
 process.on('sveltekit:shutdown', async (reason) => {
 	console.log('sveltekit:shutdown');
-	process.exit(0);
+	process.exit(1);
 });
 
 // Cache the locals so we don't get new ones on every request

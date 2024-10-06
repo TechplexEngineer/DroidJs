@@ -19,7 +19,7 @@ console.log('Is Raspberry Pi:', isRaspberryPi);
 
 
 const deadband = 0.01;
-const maxSpeed = 0.2;
+const maxSpeed = 0.5;
 
 const PortMapping = {
 	leftMotor: 0,
@@ -45,46 +45,46 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 	// 	clearInterval(driveIntervalHandle);
 	// 	driveIntervalHandle = null;
 	// }
-	// driveIntervalHandle = setInterval(async () => {
-	// 	if (!controllerMapCache) {
-	// 		controllerMapCache = await configDb.getControllerMap();
-	// 		console.log('Controller map reloaded: WHILE DRIVING', controllerMapCache); // we don't expect this to happen, but it makes TSC happy
-	// 	}
-	// 	// Driving
-	// 	const { left: l, right: r } = polarSteering(
-	// 		applyDeadband(js.getAxisByName(controllerMapCache['drive'].buttonOrAxisName), deadband),
-	// 		applyDeadband(js.getAxisByName(controllerMapCache['turn'].buttonOrAxisName), deadband)
-	// 	);
-	// 	const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
-	// 	const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
-	// 	if (left !== 0 || right !== 0) {
-	// 		console.log('DRIVE\tLeft:', left, 'Right:', right);
-	// 	}
+	driveIntervalHandle = setInterval(async () => {
+		if (!controllerMapCache) {
+			controllerMapCache = await configDb.getControllerMap();
+			console.log('Controller map reloaded: WHILE DRIVING', controllerMapCache); // we don't expect this to happen, but it makes TSC happy
+		}
+		// Driving
+		const { left: l, right: r } = polarSteering(
+			applyDeadband(js.getAxisByName(controllerMapCache['drive'].buttonOrAxisName), deadband),
+			applyDeadband(js.getAxisByName(controllerMapCache['turn'].buttonOrAxisName), deadband)
+		);
+		const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
+		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
+		if (left !== 0 || right !== 0) {
+			console.log('DRIVE\tLeft:', left, 'Right:', right);
+		}
 
-	// 	motor.setSpeed(PortMapping.leftMotor, -left);
-	// 	motor.setSpeed(PortMapping.rightMotor, right);
+		motor.setSpeed(PortMapping.leftMotor, -left);
+		motor.setSpeed(PortMapping.rightMotor, right);
 
-	// 	// Dome
-	// 	const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
-	// 	motor.setSpeed(PortMapping.dome, dome);
-	// 	if (dome !== 0) {
-	// 		console.log('DOME\t', dome);
-	// 	}
+		// Dome
+		const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
+		motor.setSpeed(PortMapping.dome, dome);
+		if (dome !== 0) {
+			console.log('DOME\t', dome);
+		}
 
-	// }, 1 * 250);
+	}, 1 * 250);
 
 	// js.on("update", async (ev) => {
 	// 	// if (ev.value !== 1) return; // only when button pressed
 	// 	console.log('update', JSON.stringify(ev));
 	// });
 
-	// js.on(controllerMapCache['reload'].buttonOrAxisName, async (ev) => {
-	// 	if (ev.value !== 1) return; // only when button pressed
+	js.on(controllerMapCache['reload'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
 
-	// 	controllerMapCache = await configDb.getControllerMap();
-	// 	await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
-	// 	console.log('Controller map reloaded:', controllerMapCache);
-	// });
+		controllerMapCache = await configDb.getControllerMap();
+		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+		console.log('Controller map reloaded:', controllerMapCache);
+	});
 
 
 
@@ -159,7 +159,7 @@ export const startup = async (): Promise<App.Locals> => {
 
 	await pca.init();
 
-	await pca.setPWMFreq(60); //Seen others set this to 60, should be 50 per spark datasheet
+	await pca.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not wor
 
 	const motor = new PwmMotorController(pca);
 
