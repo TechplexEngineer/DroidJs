@@ -20,10 +20,11 @@ export class SoundPlayer {
             this.stop();
 
             const filePath = path.join(this.soundDirectory, filename);
-            if (!isMac) {
-                this.process = spawn('mpg321', ["-q", filePath, '-g', `${volume}`]);
-            } else {
+            console.log('Playing:', filePath);
+            if (isMac) {
                 this.process = spawn('afplay', [filePath, '-v', `${volume}`]);
+            } else {
+                this.process = spawn('mpg321', ["-q", filePath, '-g', `${volume}`]);
             }
 
             let stdOut: string[] = [];

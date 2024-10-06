@@ -19,7 +19,8 @@ console.log('Is Raspberry Pi:', isRaspberryPi);
 
 
 const deadband = 0.01;
-const maxSpeed = 0.2;
+const maxSpeed = 0.5;
+const domeMaxSpeed = .75;
 
 const PortMapping = {
 	leftMotor: 0,
@@ -124,7 +125,7 @@ export const startup = async (): Promise<App.Locals> => {
 
 		// Dome
 		const dome = applyDeadband(js.getAxisByName('RIGHT_STICK_X'), deadband);
-		motor.setSpeed(PortMapping.dome, dome);
+		motor.setSpeed(PortMapping.dome, dome*domeMaxSpeed);
 
 	}, 1 * 250);
 
@@ -139,7 +140,7 @@ export const startup = async (): Promise<App.Locals> => {
 	js.on('X', (ev) => {
 		if (ev.value !== 1) return; // dont play when button released
 
-		player.playSound("HUM/HUM__014.mp3");
+		player.playSound(soundDirPath+"/HUM/HUM__014.mp3");
 	});
 
 	let scriptDirPath = "./scripts";
