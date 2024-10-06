@@ -34,17 +34,17 @@ if (import.meta.hot) {
 	});
 }
 let controllerMapCache: ControllerMap | null = null;
-let volume = 75;
+let volume = 50; //@todo load from config file, save to config file
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
 
 export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
 	console.log('setupEventHandlers');
-	// js.removeAllListeners();
-	// if (driveIntervalHandle) {
-	// 	clearInterval(driveIntervalHandle);
-	// 	driveIntervalHandle = null;
-	// }
+	js.removeAllListeners();
+	if (driveIntervalHandle) {
+		clearInterval(driveIntervalHandle);
+		driveIntervalHandle = null;
+	}
 	driveIntervalHandle = setInterval(async () => {
 		if (!controllerMapCache) {
 			controllerMapCache = await configDb.getControllerMap();
@@ -85,9 +85,6 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
 		console.log('Controller map reloaded:', controllerMapCache);
 	});
-
-
-
 
 	js.on(controllerMapCache['volumeUp'].buttonOrAxisName, async (ev) => {
 		if (ev.value !== controllerMapCache['volumeUp'].axisValue) {
