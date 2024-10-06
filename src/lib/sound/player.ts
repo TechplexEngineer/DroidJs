@@ -19,14 +19,16 @@ export class SoundPlayer {
 
     // HUM__014.mp3
     async playSound(filename: string, volume: number) {
-        console.log('Playing sound', filename, volume);
+        
         
         return new Promise<void>((resolve, reject) => {
             this.stop();
 
             const filePath = path.join(this.soundDirectory, filename);
+            console.log('Playing sound', filePath, volume);
             if (!isMac) {
                 this.process = spawn('mpg321', ["-q", filePath, '-g', `${volume}`]);
+                // console.log('mpg321', ["-q", filePath, '-g', `${volume}`])
             } else {
                 this.process = spawn('afplay', [filePath, '-v', `${volume}`]);
             }

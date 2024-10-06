@@ -40,52 +40,51 @@ let driveIntervalHandle: NodeJS.Timeout | null = null;
 
 export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
 	console.log('setupEventHandlers');
-	js.removeAllListeners();
-	if (driveIntervalHandle) {
-		clearInterval(driveIntervalHandle);
-		driveIntervalHandle = null;
-	}
-	driveIntervalHandle = setInterval(async () => {
-		if (!controllerMapCache) {
-			controllerMapCache = await configDb.getControllerMap();
-			console.log('Controller map reloaded: WHILE DRIVING', controllerMapCache); // we don't expect this to happen, but it makes TSC happy
-		}
-		// Driving
-		const { left: l, right: r } = polarSteering(
-			applyDeadband(js.getAxisByName(controllerMapCache['drive'].buttonOrAxisName), deadband),
-			applyDeadband(js.getAxisByName(controllerMapCache['turn'].buttonOrAxisName), deadband)
-		);
-		const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
-		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
-		if (left !== 0 || right !== 0) {
-			console.log('DRIVE\tLeft:', left, 'Right:', right);
-		}
+	// js.removeAllListeners();
+	// if (driveIntervalHandle) {
+	// 	clearInterval(driveIntervalHandle);
+	// 	driveIntervalHandle = null;
+	// }
+	// driveIntervalHandle = setInterval(async () => {
+	// 	if (!controllerMapCache) {
+	// 		controllerMapCache = await configDb.getControllerMap();
+	// 		console.log('Controller map reloaded: WHILE DRIVING', controllerMapCache); // we don't expect this to happen, but it makes TSC happy
+	// 	}
+	// 	// Driving
+	// 	const { left: l, right: r } = polarSteering(
+	// 		applyDeadband(js.getAxisByName(controllerMapCache['drive'].buttonOrAxisName), deadband),
+	// 		applyDeadband(js.getAxisByName(controllerMapCache['turn'].buttonOrAxisName), deadband)
+	// 	);
+	// 	const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
+	// 	const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
+	// 	if (left !== 0 || right !== 0) {
+	// 		console.log('DRIVE\tLeft:', left, 'Right:', right);
+	// 	}
 
-		motor.setSpeed(PortMapping.leftMotor, -left);
-		motor.setSpeed(PortMapping.rightMotor, right);
+	// 	motor.setSpeed(PortMapping.leftMotor, -left);
+	// 	motor.setSpeed(PortMapping.rightMotor, right);
 
-		// Dome
-		const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
-		motor.setSpeed(PortMapping.dome, dome);
-		if (dome !== 0) {
-			console.log('DOME\t', dome);
-		}
+	// 	// Dome
+	// 	const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
+	// 	motor.setSpeed(PortMapping.dome, dome);
+	// 	if (dome !== 0) {
+	// 		console.log('DOME\t', dome);
+	// 	}
 
-	}, 1 * 250);
+	// }, 1 * 250);
 
-	js.on("update", async (ev) => {
-		// if (ev.value !== 1) return; // only when button pressed
+	// js.on("update", async (ev) => {
+	// 	// if (ev.value !== 1) return; // only when button pressed
+	// 	console.log('update', JSON.stringify(ev));
+	// });
 
-		console.log('update', JSON.stringify(ev));
-	});
+	// js.on(controllerMapCache['reload'].buttonOrAxisName, async (ev) => {
+	// 	if (ev.value !== 1) return; // only when button pressed
 
-	js.on(controllerMapCache['reload'].buttonOrAxisName, async (ev) => {
-		if (ev.value !== 1) return; // only when button pressed
-
-		controllerMapCache = await configDb.getControllerMap();
-		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
-		console.log('Controller map reloaded:', controllerMapCache);
-	});
+	// 	controllerMapCache = await configDb.getControllerMap();
+	// 	await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+	// 	console.log('Controller map reloaded:', controllerMapCache);
+	// });
 
 
 
@@ -172,6 +171,7 @@ export const startup = async (): Promise<App.Locals> => {
 	if (process.env.NODE_ENV === 'production') {
 		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
 	}
+	console.log('Sound dir:', soundDirPath);
 
 	const player = new SoundPlayer(soundDirPath)
 
@@ -196,6 +196,7 @@ export const startup = async (): Promise<App.Locals> => {
 	if (process.env.NODE_ENV === 'production') {
 		scriptDirPath = '/home/pi/DroidJs/scripts'; //@todo don't hardcode this, get from config
 	}
+	console.log('Script dir:', scriptDirPath);
 
 	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {});
 
@@ -204,6 +205,11 @@ export const startup = async (): Promise<App.Locals> => {
 		controllerMapCache = await configDb.getControllerMap();
 		console.log('controllerMapCache:', controllerMapCache);
 	}
+
+	js.on("update", async (ev) => {
+		// if (ev.value !== 1) return; // only when button pressed
+		console.log('update', JSON.stringify(ev));
+	});
 
 	setupEventHandlers(js, configDb, controllerMapCache, player, motor);
 
