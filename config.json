@@ -16,22 +16,6 @@
             "joystickName": "js0",
             "buttonOrAxisName": "RIGHT_STICK_X"
         },
-        "randomSoundAlarm": {
-            "joystickName": "js0",
-            "buttonOrAxisName": "Y"
-        },
-        "randomSoundOoh": {
-            "joystickName": "js0",
-            "buttonOrAxisName": "X"
-        },
-        "randomSoundMisc": {
-            "joystickName": "js0",
-            "buttonOrAxisName": "A"
-        },
-        "randomSoundSentence": {
-            "joystickName": "js0",
-            "buttonOrAxisName": "B"
-        },
         "volumeUp": {
             "joystickName": "js0",
             "buttonOrAxisName": "DPAD_Y",
@@ -41,6 +25,30 @@
             "joystickName": "js0",
             "buttonOrAxisName": "DPAD_Y",
             "axisValue": 1
+        },
+        "randomSoundAlarm": {
+            "joystickName": "js0",
+            "buttonOrAxisName": "Y",
+            "type": "sound",
+            "category": "Alarm"
+        },
+        "randomSoundOoh": {
+            "joystickName": "js0",
+            "buttonOrAxisName": "X",
+            "type": "sound",
+            "category":"Ooh" 
+        },
+        "randomSoundMisc": {
+            "joystickName": "js0",
+            "buttonOrAxisName": "A",
+            "type": "sound",
+            "category": "Misc"
+        },
+        "randomSoundSentence": {
+            "joystickName": "js0",
+            "buttonOrAxisName": "B",
+            "type": "sound",
+            "category": "razz"
         }
     },
     "hardware": [

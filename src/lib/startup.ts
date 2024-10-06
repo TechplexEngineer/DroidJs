@@ -87,29 +87,7 @@ export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb,
 		console.log('Controller map reloaded:', controllerMapCache);
 	});
 
-	js.on(controllerMapCache['randomSoundAlarm'].buttonOrAxisName, async (ev) => {
-		if (ev.value !== 1) return; // only when button pressed
-
-		player.playRandomSound('alarm', volume);
-	});
-
-	js.on(controllerMapCache['randomSoundOoh'].buttonOrAxisName, async (ev) => {
-		if (ev.value !== 1) return; // only when button pressed
-
-		player.playRandomSound('ooh', volume);
-	});
-
-	js.on(controllerMapCache['randomSoundMisc'].buttonOrAxisName, async (ev) => {
-		if (ev.value !== 1) return; // only when button pressed
-
-		player.playRandomSound('misc', volume);
-	});
-
-	js.on(controllerMapCache['randomSoundSentence'].buttonOrAxisName, async (ev) => {
-		if (ev.value !== 1) return; // only when button pressed
-
-		player.playRandomSound('razz', volume);
-	});
+	
 
 
 	js.on(controllerMapCache['volumeUp'].buttonOrAxisName, async (ev) => {
@@ -137,6 +115,20 @@ export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb,
 		}
 		await player.playSound('UTIL/VolumeDown.mp3', volume);
 	});
+
+	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "sound") ) {
+		console.log('Setting up sound event:', value);
+		
+		if (value.category) {
+			js.on(value.buttonOrAxisName, async (ev) => {			
+				if (ev.value !== 1) { // only when button pressed, not released
+					return;
+				}
+				await player.playRandomSound(value.category || null, volume);
+			});
+		}		
+	}
+
 };
 
 export const startup = async (): Promise<App.Locals> => {

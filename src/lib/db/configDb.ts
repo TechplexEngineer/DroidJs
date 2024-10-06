@@ -18,7 +18,9 @@ export type ActionInput = {
     joystickName: string,
     buttonOrAxisName: string,
     comboKey?: string,
-    axisValue?: number
+    axisValue?: number,
+    type?: string // only 'sound' supported now
+    category?: string // only supported when type is 'sound'
 }
 
 export type ControllerMap = Record<Action, ActionInput>;

@@ -19,6 +19,8 @@ export class SoundPlayer {
 
     // HUM__014.mp3
     async playSound(filename: string, volume: number) {
+        console.log('Playing sound', filename, volume);
+        
         return new Promise<void>((resolve, reject) => {
             this.stop();
 
@@ -74,6 +76,8 @@ export class SoundPlayer {
     }
 
     async playRandomSound(category: string | null, volume: number, ) {
+        console.log('Playing random sound', category, volume);
+        
         const sounds = await this.listSounds();
 
         if (category == null || category== "any") {
