@@ -2,20 +2,23 @@ import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
+import uFuzzy from '@leeoniya/ufuzzy';
 
 const isMac = os.type() === 'Darwin' || os.type().indexOf('Windows') > -1;
 
 export class SoundPlayer {
-    soundDirectory: string;
-    process: ChildProcessWithoutNullStreams | null = null
+    private soundDirectory: string;
+    private process: ChildProcessWithoutNullStreams | null = null
+    private matcher: uFuzzy;
 
     //eg. /home/pi/r2_control/sounds/
     constructor(soundDirectory: string) {
         this.soundDirectory = soundDirectory;
+        this.matcher = new uFuzzy({});
     }
 
     // HUM__014.mp3
-    async playSound(filename: string, volume = 50) {
+    async playSound(filename: string, volume: number) {
         return new Promise<void>((resolve, reject) => {
             this.stop();
 
@@ -65,8 +68,35 @@ export class SoundPlayer {
     }
 
     async listSounds() {
+        console.log('Listing sounds in', this.soundDirectory);
         const listing = await fs.readdir(this.soundDirectory, { recursive: true });
-        return listing.filter((file) => file.endsWith('.mp3'));
+        return listing.filter((file) => file.toLowerCase().endsWith('.mp3'));
+    }
+
+    async playRandomSound(category: string | null, volume: number, ) {
+        const sounds = await this.listSounds();
+
+        if (category == null || category== "any") {
+            const randomIndex = Math.floor(Math.random() * sounds.length);
+            const randomSound = sounds[randomIndex];
+            return await this.playSound(randomSound, volume);
+        }
+
+        const grouped = groupSounds(sounds);
+        const groups = Object.keys(grouped);
+        const matches = this.matcher.filter(groups, category);
+        if (!matches || matches.length === 0) {
+            console.log(`No matches for ${category}`);
+            return;
+        }
+
+        const groupName = groups[matches[0]];
+
+        if (groupName) {
+            const randomIndex = Math.floor(Math.random() * grouped[groupName].length);
+            const randomSound = grouped[groupName][randomIndex];
+            await this.playSound(`${groupName}/${randomSound}`, volume);
+        }
     }
 
 

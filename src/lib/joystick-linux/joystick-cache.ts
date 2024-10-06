@@ -26,6 +26,7 @@ export class JoystickCache extends EventEmitter<JsCacheEvents> {
 			if ('name' in ev) {
 				this.emit(`${ev.name}`, ev)
 			}
+			this.emit(`update`, ev)
 		});
 	}
 

@@ -1,5 +1,14 @@
 <script>
 	import { page } from '$app/stores';
+
+	const pages = [
+		{ title: 'Home', href: '/' },
+		{ title: 'About', href: '/about' },
+		{ title: 'Audio', href: '/audio' },
+		{ title: 'Config', href: '/config' },
+		{ title: 'Controller', href: '/controller' },
+		{ title: 'Script', href: '/script' }
+	]
 </script>
 
 <header>
@@ -12,24 +21,11 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">Home</a>
-			</li>
-			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
-				<a href="/about">About</a>
-			</li>
-			<li aria-current={$page.url.pathname.startsWith('/audio') ? 'page' : undefined}>
-				<a href="/audio">Audio</a>
-			</li>
-			<li aria-current={$page.url.pathname.startsWith('/config') ? 'page' : undefined}>
-				<a href="/config">Config</a>
-			</li>
-			<li aria-current={$page.url.pathname.startsWith('/controller') ? 'page' : undefined}>
-				<a href="/controller">Controller</a>
-			</li>
-			<li aria-current={$page.url.pathname.startsWith('/script') ? 'page' : undefined}>
-				<a href="/script">Script</a>
-			</li>
+			{#each pages as { title, href }}
+				<li aria-current={$page.url.pathname === href ? 'page' : undefined}>
+					<a href={href}>{title}</a>
+				</li>
+			{/each}
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />

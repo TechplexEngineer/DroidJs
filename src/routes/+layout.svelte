@@ -5,7 +5,7 @@
 	import '../app.scss';
 	// import './styles.css';
 
-	import Header from './Header.svelte';
+	import Header from '../lib/components/Header.svelte';
 
 	onMount(async () => {
 		if (!browser) return;

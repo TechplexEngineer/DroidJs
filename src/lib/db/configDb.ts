@@ -11,6 +11,18 @@ export type servoConfig = {
 
 }[];
 
+
+// given an action (drive Fwd) look up what joystick and button or axis to use
+export type Action = string;
+export type ActionInput = {
+    joystickName: string,
+    buttonOrAxisName: string,
+    comboKey?: string,
+    axisValue?: number
+}
+
+export type ControllerMap = Record<Action, ActionInput>;
+
 export class ConfigDb {
     private db: FileDb;
 
@@ -21,5 +33,10 @@ export class ConfigDb {
     async getServos(): Promise<servoConfig> {
         const data = await this.db.read()
         return data['servos'] as servoConfig || {};
+    }
+
+    async getControllerMap(): Promise<ControllerMap> {
+        const data = await this.db.read()
+        return data['controllerMap'] as ControllerMap || {};
     }
 }

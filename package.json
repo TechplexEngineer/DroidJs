@@ -39,6 +39,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@leeoniya/ufuzzy": "^1.0.14",
 		"@sveltejs/adapter-node": "^5.2.4",
 		"@types/i2c-bus": "^5.1.2",
 		"bootstrap": "^5.3.3",

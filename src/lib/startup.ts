@@ -1,6 +1,6 @@
 import { Joystick } from '$lib/joystick-linux/joystick';
 import { LogitechF310Mapper } from './controllers/logitech-f310';
-import { ConfigDb } from './db/configDb';
+import { ConfigDb, type ControllerMap } from './db/configDb';
 import { FileDb } from './db/jsondb';
 import { polarSteering } from './drivetrain/drive';
 import { JoystickCache } from './joystick-linux/joystick-cache';
@@ -33,6 +33,111 @@ if (import.meta.hot) {
 		console.log('reload!');
 	});
 }
+let controllerMapCache: ControllerMap | null = null;
+let volume = 75;
+
+let driveIntervalHandle: NodeJS.Timeout | null = null;
+
+export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
+	console.log('setupEventHandlers');
+	js.removeAllListeners();
+	if (driveIntervalHandle) {
+		clearInterval(driveIntervalHandle);
+		driveIntervalHandle = null;
+	}
+	driveIntervalHandle = setInterval(async () => {
+		if (!controllerMapCache) {
+			controllerMapCache = await configDb.getControllerMap();
+			console.log('Controller map reloaded: WHILE DRIVING', controllerMapCache); // we don't expect this to happen, but it makes TSC happy
+		}
+		// Driving
+		const { left: l, right: r } = polarSteering(
+			applyDeadband(js.getAxisByName(controllerMapCache['drive'].buttonOrAxisName), deadband),
+			applyDeadband(js.getAxisByName(controllerMapCache['turn'].buttonOrAxisName), deadband)
+		);
+		const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
+		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
+		if (left !== 0 || right !== 0) {
+			console.log('DRIVE\tLeft:', left, 'Right:', right);
+		}
+
+		motor.setSpeed(PortMapping.leftMotor, -left);
+		motor.setSpeed(PortMapping.rightMotor, right);
+
+		// Dome
+		const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
+		motor.setSpeed(PortMapping.dome, dome);
+		if (dome !== 0) {
+			console.log('DOME\t', dome);
+		}
+
+	}, 1 * 250);
+
+	js.on("update", async (ev) => {
+		// if (ev.value !== 1) return; // only when button pressed
+
+		console.log('update', JSON.stringify(ev));
+	});
+
+	js.on(controllerMapCache['reload'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
+
+		controllerMapCache = await configDb.getControllerMap();
+		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+		console.log('Controller map reloaded:', controllerMapCache);
+	});
+
+	js.on(controllerMapCache['randomSoundAlarm'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
+
+		player.playRandomSound('alarm', volume);
+	});
+
+	js.on(controllerMapCache['randomSoundOoh'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
+
+		player.playRandomSound('ooh', volume);
+	});
+
+	js.on(controllerMapCache['randomSoundMisc'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
+
+		player.playRandomSound('misc', volume);
+	});
+
+	js.on(controllerMapCache['randomSoundSentence'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== 1) return; // only when button pressed
+
+		player.playRandomSound('razz', volume);
+	});
+
+
+	js.on(controllerMapCache['volumeUp'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== controllerMapCache['volumeUp'].axisValue) {
+			return;
+		}
+
+		if (volume < 100-4) {
+			volume += 5;
+			console.log('Volume:', volume);
+			await player.playSound('UTIL/VolumeUp.mp3', volume);
+		} else {
+			await player.playSound('UTIL/VolumeMax.mp3', volume);
+		}
+	});
+
+	js.on(controllerMapCache['volumeDown'].buttonOrAxisName, async (ev) => {
+		if (ev.value !== controllerMapCache['volumeDown'].axisValue) {
+			return;
+		}
+
+		if (volume > 0+4) {
+			volume -= 5;
+			console.log('Volume:', volume);
+		}
+		await player.playSound('UTIL/VolumeDown.mp3', volume);
+	});
+};
 
 export const startup = async (): Promise<App.Locals> => {
 	
@@ -47,9 +152,9 @@ export const startup = async (): Promise<App.Locals> => {
 		console.log('Joystick disconnected');
 	});
 
-	// stick.on('jserror', () => {
-	// 	console.log('Joystick error');
-	// });
+	stick.on('jserror', () => {
+		console.log('Joystick error');
+	});
 
 	const i2cBusNum = 1;
 
@@ -70,6 +175,13 @@ export const startup = async (): Promise<App.Locals> => {
 
 	const astropixels = new Astropixels(con);
 
+	let soundDirPath = "./sounds";
+	if (process.env.NODE_ENV === 'production') {
+		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
+	}
+
+	const player = new SoundPlayer(soundDirPath)
+
 	let configFilePath = './config.json';
 	if (process.env.NODE_ENV === 'production') {
 		console.log('Running in production mode');
@@ -87,6 +199,26 @@ export const startup = async (): Promise<App.Locals> => {
 		servo.setAngle(channel, homePos ?? 0);
 	}
 
+	let scriptDirPath = "./scripts";
+	if (process.env.NODE_ENV === 'production') {
+		scriptDirPath = '/home/pi/DroidJs/scripts'; //@todo don't hardcode this, get from config
+	}
+
+	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {});
+
+
+	if (!controllerMapCache) {
+		controllerMapCache = await configDb.getControllerMap();
+		console.log('controllerMapCache:', controllerMapCache);
+	}
+
+	setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+	
+
+	// randomSoundAlarm
+	// randomSoundOoh
+	// randomSoundMisc
+	// randomSoundSentence
 
 	// let setpoint = 160;
 
@@ -109,46 +241,9 @@ export const startup = async (): Promise<App.Locals> => {
 	// });
 
 
-	setInterval(() => {
-		// Driving
-		const { left: l, right: r } = polarSteering(
-			applyDeadband(js.getAxisByName('LEFT_STICK_Y'), deadband),
-			applyDeadband(js.getAxisByName('LEFT_STICK_X'), deadband)
-		);
-		const left = mapRange(l, -1, 1, -maxSpeed, maxSpeed);
-		const right = mapRange(r, -1, 1, -maxSpeed, maxSpeed);
-		// console.log('Left:', left, 'Right:', right);
+	
 
-		motor.setSpeed(PortMapping.leftMotor, -left);
-		motor.setSpeed(PortMapping.rightMotor, right);
-
-		// Dome
-		const dome = applyDeadband(js.getAxisByName('RIGHT_STICK_X'), deadband);
-		motor.setSpeed(PortMapping.dome, dome);
-
-	}, 1 * 250);
-
-
-	let soundDirPath = "./sounds";
-	if (process.env.NODE_ENV === 'production') {
-		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
-	}
-
-	const player = new SoundPlayer(soundDirPath)
-
-	js.on('X', (ev) => {
-		if (ev.value !== 1) return; // dont play when button released
-
-		player.playSound("HUM/HUM__014.mp3");
-	});
-
-	let scriptDirPath = "./scripts";
-	if (process.env.NODE_ENV === 'production') {
-		scriptDirPath = '/home/pi/DroidJs/scripts'; //@todo don't hardcode this, get from config
-	}
-
-	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {});
-
+	
 
 	return {
 		soundPlayer: player,
