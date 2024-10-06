@@ -38,7 +38,7 @@ let volume = 75;
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
 
-export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
+export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
 	console.log('setupEventHandlers');
 	js.removeAllListeners();
 	if (driveIntervalHandle) {
@@ -87,7 +87,7 @@ export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb,
 		console.log('Controller map reloaded:', controllerMapCache);
 	});
 
-	
+
 
 
 	js.on(controllerMapCache['volumeUp'].buttonOrAxisName, async (ev) => {
@@ -95,7 +95,7 @@ export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb,
 			return;
 		}
 
-		if (volume < 100-4) {
+		if (volume < 100 - 4) {
 			volume += 5;
 			console.log('Volume:', volume);
 			await player.playSound('UTIL/VolumeUp.mp3', volume);
@@ -109,31 +109,32 @@ export const setupEventHandlers = async  (js: JoystickCache, configDb: ConfigDb,
 			return;
 		}
 
-		if (volume > 0+4) {
+		if (volume > 0 + 4) {
 			volume -= 5;
 			console.log('Volume:', volume);
 		}
 		await player.playSound('UTIL/VolumeDown.mp3', volume);
 	});
 
-	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "sound") ) {
+	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "sound")) {
 		console.log('Setting up sound event:', value);
-		
+
 		if (value.category) {
-			js.on(value.buttonOrAxisName, async (ev) => {			
+			js.on(value.buttonOrAxisName, async (ev) => {
 				if (ev.value !== 1) { // only when button pressed, not released
 					return;
 				}
 				await player.playRandomSound(value.category || null, volume);
 			});
-		}		
+		}
 	}
 
 };
 
 export const startup = async (): Promise<App.Locals> => {
-	
+
 	console.log('Startup cwd:', process.cwd());
+	console.log('startup env', process.env)
 
 	const stick = new Joystick('/dev/input/js0', { mappingFn: LogitechF310Mapper.eventMapper });
 	const js = new JoystickCache(stick, LogitechF310Mapper);
@@ -205,7 +206,7 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 
 	setupEventHandlers(js, configDb, controllerMapCache, player, motor);
-	
+
 
 	// randomSoundAlarm
 	// randomSoundOoh
@@ -233,9 +234,9 @@ export const startup = async (): Promise<App.Locals> => {
 	// });
 
 
-	
 
-	
+
+
 
 	return {
 		soundPlayer: player,
@@ -243,6 +244,6 @@ export const startup = async (): Promise<App.Locals> => {
 		db: filedb,
 		// motorController: motor,
 		// servoController: servo,
-		
+
 	}
 };
