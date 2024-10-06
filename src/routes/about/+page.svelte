@@ -1,6 +1,6 @@
 <svelte:head>
 	<title>About :: DroidJs</title>
-	<meta name="description" content="About this app" />
+	<meta name="description" content="About DroidJs Droid Control Software" />
 </svelte:head>
 
 <div class="text-column">
