@@ -8,16 +8,20 @@ process.on('sveltekit:shutdown', async (reason) => {
 });
 
 // Cache the locals so we don't get new ones on every request
-let appLocalsCache: any = null;
+let appLocalsCache: Promise<App.Locals> | null = null;
+if (building) {
+	console.log('Building, skipping hardware startup');
+} else {
+	if (!appLocalsCache) {
+		appLocalsCache = startup();
+	}
+
+}
+
 
 export const handle: Handle = async ({ event, resolve }) => {
-	if (building) {
-		console.log('Building, skipping hardware startup');
-	} else {
-		if (!appLocalsCache) {
-			appLocalsCache = await startup();
-		}
-		event.locals = appLocalsCache;
+	if (appLocalsCache !== null) {
+		event.locals = await appLocalsCache;
 	}
 
 	const response = await resolve(event);
