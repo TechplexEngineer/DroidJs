@@ -20,6 +20,7 @@ console.log('Is Raspberry Pi:', isRaspberryPi);
 
 const deadband = 0.01;
 const maxSpeed = 0.5;
+const domeMaxSpeed = .2;
 
 const PortMapping = {
 	leftMotor: 0,
@@ -65,7 +66,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 		motor.setSpeed(PortMapping.rightMotor, right);
 
 		// Dome
-		const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband);
+		const dome = applyDeadband(js.getAxisByName(controllerMapCache['dome'].buttonOrAxisName), deadband) * domeMaxSpeed;
 		motor.setSpeed(PortMapping.dome, dome);
 		if (dome !== 0) {
 			console.log('DOME\t', dome);
