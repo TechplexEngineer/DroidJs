@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   // src/routes/+page.svelte
   import { source } from 'sveltekit-sse'
   const value = source('/joystick/js0').select('message')
@@ -16,4 +16,4 @@
   $: appendValue($value);
 </script>
 
-{messages}
+{messages} -->
