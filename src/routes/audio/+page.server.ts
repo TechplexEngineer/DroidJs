@@ -2,7 +2,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
     return {
-        files: await locals.soundPlayer.listSounds()
+        files: await locals.soundPlayer.listSounds(),
+        volume: locals.soundPlayer.getVolume()
     };
 }) satisfies PageServerLoad;
 
@@ -20,4 +21,12 @@ export const actions = {
         console.log('stop');
         locals.soundPlayer.stop();
     },
+    setVolume: async ({ locals, request }) => {
+        const data = await request.formData();
+        const volume = data.get('volume')?.toString();
+        if (!volume) {
+            return;
+        }
+        locals.soundPlayer.setVolume(parseInt(volume));
+    }
 } satisfies Actions;

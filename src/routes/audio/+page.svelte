@@ -3,12 +3,32 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	let volumeForm: HTMLFormElement;
+
+	function debounce(func: () => void, wait: number) {
+		let timeout: ReturnType<typeof setTimeout>;
+		return () => {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				func();
+			}, wait);
+		};
+	}
 </script>
 
 <svelte:head>
 	<title>Audio :: DroidJs</title>
 	<meta name="description" content="Make your droid speak DroidJs Droid Control Software" />
 </svelte:head>
+
+<form method="POST" action="?/setVolume" bind:this={volumeForm} use:enhance>
+	<label for="volume" class="form-label">Volume</label>
+	<div class="d-flex">
+		<input type="range" class="form-range" min="0" max="100" name="volume" value={data.volume} on:change={() => volumeForm.requestSubmit()}>
+		<input type="number" class="form-control" name="volumeNum" id="" value={data.volume} style="max-width: 75px; margin-left: 25px; margin-top: -7px">
+	</div>
+</form>
 
 <form method="POST" action="?/stop" use:enhance>
 	<button type="submit" class="btn btn-danger">Stop</button>

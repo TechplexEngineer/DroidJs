@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 import uFuzzy from '@leeoniya/ufuzzy';
+import { clamp } from '$lib/utils/math';
 
 const isMac = os.type() === 'Darwin' || os.type().indexOf('Windows') > -1;
 
@@ -10,6 +11,7 @@ export class SoundPlayer {
     private soundDirectory: string;
     private process: ChildProcessWithoutNullStreams | null = null
     private matcher: uFuzzy;
+    private volume: number = 75; //@todo load from config file, save to config file
 
     //eg. /home/pi/r2_control/sounds/
     constructor(soundDirectory: string) {
@@ -17,20 +19,29 @@ export class SoundPlayer {
         this.matcher = new uFuzzy({});
     }
 
+    public setVolume(volume: number) {
+        this.volume = clamp(volume, 0, 100);
+        console.log('Volume set to', this.volume);
+    }
+    public getVolume() {
+        return this.volume;
+    }
+
+
     // HUM__014.mp3
-    async playSound(filename: string, volume: number) {
+    async playSound(filename: string) {
         
         
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve, _reject) => {
             this.stop();
 
             const filePath = path.join(this.soundDirectory, filename);
-            console.log('Playing sound', filePath, volume);
+            console.log('Playing sound', filePath, this.volume);
             if (!isMac) {
-                this.process = spawn('mpg321', ["-q", filePath, '-g', `${volume}`]);
-                // console.log('mpg321', ["-q", filePath, '-g', `${volume}`])
+                this.process = spawn('mpg321', ["-q", filePath, '-g', `${this.volume}`]);
+                // console.log('mpg321', ["-q", filePath, '-g', `${this.volume}`])
             } else {
-                this.process = spawn('afplay', [filePath, '-v', `${volume}`]);
+                this.process = spawn('afplay', [filePath, '-v', `${this.volume}`]);
             }
 
             let stdOut: string[] = [];
@@ -77,15 +88,15 @@ export class SoundPlayer {
         return listing.filter((file) => file.toLowerCase().endsWith('.mp3'));
     }
 
-    async playRandomSound(category: string | null, volume: number, ) {
-        console.log('Playing random sound', category, volume);
+    async playRandomSound(category: string | null) {
+        console.log('Playing random sound', category);
         
         const sounds = await this.listSounds();
 
         if (category == null || category== "any") {
             const randomIndex = Math.floor(Math.random() * sounds.length);
             const randomSound = sounds[randomIndex];
-            return await this.playSound(randomSound, volume);
+            return await this.playSound(randomSound);
         }
 
         const grouped = groupSounds(sounds);
@@ -101,12 +112,9 @@ export class SoundPlayer {
         if (groupName) {
             const randomIndex = Math.floor(Math.random() * grouped[groupName].length);
             const randomSound = grouped[groupName][randomIndex];
-            await this.playSound(`${groupName}/${randomSound}`, volume);
+            await this.playSound(`${groupName}/${randomSound}`);
         }
     }
-
-
-
 }
 
 export const groupSounds = (sounds: string[]) => {

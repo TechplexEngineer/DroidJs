@@ -35,7 +35,6 @@ if (import.meta.hot) {
 	});
 }
 let controllerMapCache: ControllerMap | null = null;
-let volume = 50; //@todo load from config file, save to config file
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
 
@@ -92,12 +91,12 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 			return;
 		}
 
-		if (volume < 100 - 4) {
-			volume += 5;
-			console.log('Volume:', volume);
-			await player.playSound('UTIL/VolumeUp.mp3', volume);
+		if (player.getVolume() < 100 - 4) {
+			player.setVolume(player.getVolume() + 5);
+			console.log('Volume:', player.getVolume());
+			await player.playSound('UTIL/VolumeUp.mp3');
 		} else {
-			await player.playSound('UTIL/VolumeMax.mp3', volume);
+			await player.playSound('UTIL/VolumeMax.mp3');
 		}
 	});
 
@@ -106,11 +105,11 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 			return;
 		}
 
-		if (volume > 0 + 4) {
-			volume -= 5;
-			console.log('Volume:', volume);
+		if (player.getVolume() > 0 + 4) {
+			player.setVolume(player.getVolume() - 5);
+			console.log('Volume:', player.getVolume());
 		}
-		await player.playSound('UTIL/VolumeDown.mp3', volume);
+		await player.playSound('UTIL/VolumeDown.mp3');
 	});
 
 	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "sound")) {
@@ -121,7 +120,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 				if (ev.value !== 1) { // only when button pressed, not released
 					return;
 				}
-				await player.playRandomSound(value.category || null, volume);
+				await player.playRandomSound(value.category || null);
 			});
 		}
 	}
