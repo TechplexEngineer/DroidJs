@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import RangeInput from '$lib/components/RangeInput.svelte';
+	import { ServoController } from '$lib/motion/servoController';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -9,10 +11,10 @@
 
 <!-- {JSON.stringify(data)} -->
 
-<form action="?/setAngle">
+<form action="?/setAngle" use:enhance>
     <div class="mb-3">
         <label class="form-label" for="" >Channel</label>
-        <input class="form-control" type="number" name="channel">
+        <input class="form-control" type="number" name="channel" value={data.servo.channel}>
     </div>
     <div class="mb-3">
         <label class="form-label" for="" >Value</label>
