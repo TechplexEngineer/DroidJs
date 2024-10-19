@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from '$lib/components/Modal.svelte';
+	import TableForObjectArray, { type TableColumn } from '$lib/components/TableForObjectArray.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -7,6 +8,18 @@
 	let showAddHwModal = false;
 
 	let hwTypeValue = '';
+
+	const servoActions: TableColumn[] = [
+		{
+			data: 'name',
+			title: 'Actions',
+			renderHTML: (val, type, row) => {
+				let html = `<a href="/config/servo/${val}" class="btn btn-primary">Edit</a>`;
+				// html += `<button class="btn btn-danger">Delete</button>`;
+				return html;
+			}
+		}
+	];
 </script>
 
 <svelte:head>
@@ -47,6 +60,11 @@
 		{/each}
 	</tbody>
 </table>
+
+
+<h3>Servos</h3>
+<TableForObjectArray data={data.servos} colAppend={servoActions} />
+
 
 <Modal bind:show={showAddHwModal} title="Add Hardware">
 	<form action="?/add" method="post">

@@ -2,12 +2,12 @@ import { clamp, mapRange } from '$lib/utils/math';
 import type { PwmOutput } from './pwm';
 
 export class ServoController { //need a unique one of these for each pwmControllerOutput
-	pwmControllerOutput: PwmOutput;
-	minPulseUs: number;
-	maxPulseUs: number;
-	frequencyHz: number;
-	minAngle: number;
-	maxAngle: number;
+	private pwmControllerOutput: PwmOutput;
+	private minPulseUs: number;
+	private maxPulseUs: number;
+	private frequencyHz: number;
+	private minAngle: number;
+	private maxAngle: number;
 
 	servoLocationCache = new Map<number, number>(); //channel to angle
 
@@ -20,7 +20,7 @@ export class ServoController { //need a unique one of these for each pwmControll
 		this.maxAngle = maxAngle;
 	}
 
-	setAngle(channel: number, targetAngle: number, allowOutOfBounds = false) {
+	public setAngle(channel: number, targetAngle: number, allowOutOfBounds = false) {
 		if (!allowOutOfBounds) {
 			targetAngle = clamp(targetAngle, this.minAngle, this.maxAngle);
 		}
@@ -51,7 +51,7 @@ export class ServoController { //need a unique one of these for each pwmControll
 
 	//.16 sec to miliseconds
 
-	setAngleSlow(channel: number, targetAngle: number, timeMs: number) {
+	public setAngleSlow(channel: number, targetAngle: number, timeMs: number) {
 		const startTime = Date.now(); //time in ms
 		const startingPos = this.servoLocationCache.get(channel) || 0;
 		const id = setInterval(() => {
@@ -71,8 +71,12 @@ export class ServoController { //need a unique one of these for each pwmControll
 		}, 50); //move in 50ms steps
 	}
 
-	disable(channel: number) {
+	public disable(channel: number) {
 		this.pwmControllerOutput.setPWM(channel, 0, 0);
+	}
+
+	public getCurrentLocaton(channel: number): number {
+		return this.servoLocationCache.get(channel) || 0;
 	}
 }
 

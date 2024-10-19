@@ -13,6 +13,9 @@ import { applyDeadband, mapRange } from './utils/math';
 import { browser, building, dev, version } from '$app/environment';
 import os from 'os';
 import { ScriptRunnerManager } from './script/ScriptRunnerManager';
+import { SoundHandler } from './script/handlers/soundHandler';
+import { sleepHandler } from './script/handlers/sleepHandler';
+import { ServoHandler } from './script/handlers/servoHandler';
 
 const isRaspberryPi = os.arch() === 'arm64' && os.platform() === 'linux';
 console.log('Is Raspberry Pi:', isRaspberryPi);
@@ -124,8 +127,9 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 			});
 		}
 	}
-
 };
+
+
 
 export const startup = async (): Promise<App.Locals> => {
 
@@ -148,29 +152,9 @@ export const startup = async (): Promise<App.Locals> => {
 	const i2cBusNum = 1;
 
 	const i2cBus = isRaspberryPi ? await import('i2c-bus') : await import('$lib/utils/i2c-bus-mock');
-	// const i2cBus = await import('$lib/utils/i2c-bus-mock');
-	// const i2cBus = await import('i2c-bus');
+
 
 	const con = await i2cBus.openPromisified(i2cBusNum);
-	const pca = new PCA9685(con, 0x40);
-
-	await pca.init();
-
-	await pca.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not wor
-
-	const motor = new PwmMotorController(pca);
-
-	const servo = new ServoController(pca);
-
-	const astropixels = new Astropixels(con);
-
-	let soundDirPath = "./sounds";
-	if (process.env.NODE_ENV === 'production') {
-		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
-	}
-	console.log('Sound dir:', soundDirPath);
-
-	const player = new SoundPlayer(soundDirPath)
 
 	let configFilePath = './config.json';
 	if (process.env.NODE_ENV === 'production') {
@@ -181,12 +165,41 @@ export const startup = async (): Promise<App.Locals> => {
 	const filedb = new FileDb(configFilePath);
 	const configDb = new ConfigDb(filedb);
 
+	const pcaBody = new PCA9685(con, 0x40);
+	await pcaBody.init();
+	await pcaBody.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
+	const motorBody = new PwmMotorController(pcaBody);
+	const servoBody = new ServoController(pcaBody);
+
+	const pcaDome = new PCA9685(con, 0x41);
+	await pcaDome.init();
+	await pcaDome.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
+	const servoDome = new ServoController(pcaDome);
+
+	
+	const astropixels = new Astropixels(con);
+
+	let soundDirPath = "./sounds";
+	if (process.env.NODE_ENV === 'production') {
+		soundDirPath = '/home/pi/DroidJs/sounds'; //@todo don't hardcode this, get from config
+	}
+	console.log('Sound dir:', soundDirPath);
+
+	const player = new SoundPlayer(soundDirPath)
+
+	
 	// at startup set all servos to home pos
 	const servos = await configDb.getServos();
 	console.log('Servos:', servos);
 
-	for (const { name, channel, homePos } of servos) {
-		servo.setAngle(channel, homePos ?? 0);
+	for (const { hardware, channel, homePos } of servos) {
+		if (hardware == "Dome Servos"){
+			servoDome.setAngle(channel, homePos ?? 0);
+		} else if (hardware == "Body Servos"){
+			servoBody.setAngle(channel, homePos ?? 0);
+		} else {
+			console.log('Unknown servo hardware:', hardware);
+		}
 	}
 
 	let scriptDirPath = "./scripts";
@@ -195,7 +208,15 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 	console.log('Script dir:', scriptDirPath);
 
-	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {});
+	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {
+		default: async (args, handlerName) => {
+			console.log('No handler found for:', handlerName);
+		},
+		sound: new SoundHandler(player).handler,
+		sleep: sleepHandler,
+		dome: new ServoHandler(servoDome, configDb).handler,
+		body: new ServoHandler(servoBody, configDb).handler,
+	});
 
 
 	if (!controllerMapCache) {
@@ -204,49 +225,22 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 
 	js.on("update", async (ev) => {
-		// if (ev.value !== 1) return; // only when button pressed
+		if (ev.type.toLowerCase() == "button" && ev.value !== 1) return; // only when button pressed
 		console.log('update', JSON.stringify(ev));
 	});
 
-	setupEventHandlers(js, configDb, controllerMapCache, player, motor);
-
-
-	// randomSoundAlarm
-	// randomSoundOoh
-	// randomSoundMisc
-	// randomSoundSentence
-
-	// let setpoint = 160;
-
-	// js.on('A', (ev) => {
-	// 	servo.setAngle(4, setpoint);
-	// });
-	// js.on('B', (ev) => {
-	// 	servo.setAngle(4, 0);
-	// });
-
-	// js.on('X', (ev) => {
-	// 	setpoint += 1;
-	// 	servo.setAngle(4, setpoint);
-	// 	console.log('Setpoint:', setpoint);
-	// });
-	// js.on('Y', (ev) => {
-	// 	setpoint -= 1;
-	// 	servo.setAngle(4, setpoint);
-	// 	console.log('Setpoint:', setpoint);
-	// });
-
-
-
-
+	setupEventHandlers(js, configDb, controllerMapCache, player, motorBody);
 
 
 	return {
 		soundPlayer: player,
 		scriptMgr: scriptMgr,
 		db: filedb,
-		// motorController: motor,
-		// servoController: servo,
-
+		servoMgr: servoDome, // somday we will have a servo manager to handle the two servo controllers
 	}
 };
+
+const initHardware = (configDb: ConfigDb):Record<string, any> => {
+
+	return {};
+}

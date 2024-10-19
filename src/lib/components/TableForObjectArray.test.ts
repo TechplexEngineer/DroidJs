@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
-import TableForObjectArray, { type TableColumns } from './TableForObjectArray.svelte';
+import TableForObjectArray, { type TableColumnOrStr } from './TableForObjectArray.svelte';
 
 const sampleData = [{ name: 'Alice', age: '25' }];
 
@@ -65,7 +65,7 @@ describe('TableForObjectArray', () => {
 	});
 
 	it('supports alternate render funcion renderHTML which renders the passed string as html', () => {
-		const columns: TableColumns = [
+		const columns: TableColumnOrStr = [
 			{ data: 'name', title: 'Age', renderHTML: (val) => `<strong>${val}</strong>` }
 		];
 		render(TableForObjectArray, { data: sampleData, columns: columns });

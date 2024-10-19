@@ -1,9 +1,13 @@
 <script context="module" lang="ts">
 	import { type SvelteComponent } from "svelte";
 
-	export type TableColumns = (
+	export type TableColumn = { 
+		data: string; title: string; render?: renderFn; renderHTML?: renderFn, renderComponent?: renderFnC }
+	;
+
+	export type TableColumnOrStr = (
 		| string
-		| { data: string; title: string; render?: renderFn; renderHTML?: renderFn, renderComponent?: renderFnC }
+		| TableColumn
 	)[];
 	export type renderFn = (val: any, type: any, row: any) => string;
 	export type renderFnC = (val: any, type: any, row: any) => {component: any, props: Record<string, any>};
@@ -12,13 +16,14 @@
 <script lang="ts">
 	export let data: Record<string, string | number>[];
 	
-	export let columns: TableColumns | null = null;
+	export let columns: TableColumnOrStr | null = null;
+	export let colAppend: TableColumn[] | null = null;
 	
-	export const generateListOfCols = (columns: TableColumns | null, data: Record<string, string | number>[]) => {
+	export const generateListOfCols = (columns: TableColumnOrStr | null, data: Record<string, string | number>[]) => {
 		if (columns === null) {
 			columns = Object.keys(data[0] || { 'No Data': '' });
 		}
-		return columns.map((k) => {
+		let cols = columns.map((k) => {
 			if (typeof k === 'string') {
 				return {
 					data: k,
@@ -27,6 +32,10 @@
 			}
 			return k;
 		});
+		if (Array.isArray(colAppend)) {
+			cols = [...cols, ...colAppend];
+		}
+		return cols;
 	}
 
 	$: cols2Render = generateListOfCols(columns, data);

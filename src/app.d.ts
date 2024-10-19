@@ -1,8 +1,9 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { FileDb } from "$lib/db/jsondb";
-import type { ScriptRunnerManager } from "$lib/script/ScriptRunnerManager";
 import type { SoundPlayer } from "$lib/sound/player";
+import type { ScriptRunnerManager } from "$lib/script/ScriptRunnerManager";
+import type { FileDb } from "$lib/db/jsondb";
+import type { ServoController } from "$lib/motion/servoController";
 
 // for information about these interfaces
 declare global {
@@ -12,7 +13,7 @@ declare global {
 			soundPlayer: SoundPlayer;
 			scriptMgr: ScriptRunnerManager,
 			db: FileDb
-			soundPlayer: player,
+			servoMgr: ServoController,
 		}
 		// interface PageData {}
 		// interface PageState {}

@@ -69,30 +69,114 @@
             }
         },
         {
-            "type": "Serial: Astropixels",
+            "type": "i2c: Astropixels",
             "name": "Dome Lights",
             "config": {
-                "bus": "/dev/ttyUSB0",
-                "baud": 9600
+                "i2cAddress": "0x0A"
             }
         }
     ],
     "servos": [
         {
-            "name": "Dome Servo 1",
+            "name": "PP1",
+            "desc": "Dome Pie Panel 1",
             "hardware": "Dome Servos",
-            "channel": 4,
+            "channel": 6,
             "min": 0,
             "max": 120,
             "home": 0
-        },
-        {
-            "name": "Dome Servo 2",
+        },{
+            "name": "PP2",
+            "desc": "Dome Pie Panel 2",
+            "hardware": "Dome Servos",
+            "channel": 10,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "PP3",
+            "desc": "Dome Pie Panel 3",
+            "hardware": "Dome Servos",
+            "channel": 13,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "PP4",
+            "desc": "Dome Pie Panel 4",
+            "hardware": "Dome Servos",
+            "channel": 12,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "PP5",
+            "desc": "Dome Pie Panel 5",
+            "hardware": "Dome Servos",
+            "channel": 0,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        }
+
+
+        ,{
+            "name": "P1",
+            "desc": "Dome Panel 1",
             "hardware": "Dome Servos",
             "channel": 5,
             "min": 0,
             "max": 120,
             "home": 0
+        },{
+            "name": "P2",
+            "desc": "Dome Panel 2",
+            "hardware": "Dome Servos",
+            "channel": 4,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "P3",
+            "desc": "Dome Panel 3",
+            "hardware": "Dome Servos",
+            "channel":3,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "P4",
+            "desc": "Dome Panel 4",
+            "hardware": "Dome Servos",
+            "channel": 2,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "P7",
+            "desc": "Dome Panel 7",
+            "hardware": "Dome Servos",
+            "channel": 1,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "P11",
+            "desc": "Dome Panel 11",
+            "hardware": "Dome Servos",
+            "channel": 14,
+            "min": 0,
+            "max": 120,
+            "home": 0
+        },{
+            "name": "P13",
+            "desc": "Dome Panel 13",
+            "hardware": "Dome Servos",
+            "channel": 11,
+            "min": 0,
+            "max": 120,
+            "home": 0
         }
+        
     ]
 }
