@@ -11,7 +11,7 @@ export class ServoController { //need a unique one of these for each pwmControll
 
 	servoLocationCache = new Map<number, number>(); //channel to angle
 
-	constructor(pwmOut: PwmOutput, minPulseUs = 750, maxPulseUs = 2250, frequencyHz = 50, minAngle = 0, maxAngle = 180) {
+	constructor(pwmOut: PwmOutput, minPulseUs = 1000, maxPulseUs = 2000, frequencyHz = 50, minAngle = 0, maxAngle = 180) {
 		this.pwmControllerOutput = pwmOut;
 		this.minPulseUs = minPulseUs;
 		this.maxPulseUs = maxPulseUs;
@@ -28,7 +28,8 @@ export class ServoController { //need a unique one of these for each pwmControll
 		this.servoLocationCache.set(channel, targetAngle);
 
 		const pulseWidth = mapRange(targetAngle, this.minAngle, this.maxAngle, this.minPulseUs, this.maxPulseUs);
-
+		console.log("pulseWidth", Math.round(pulseWidth));
+		
 		const usPerSecond = 1_000_000;
 		const oneCycleUs = usPerSecond / this.frequencyHz;
 
@@ -38,7 +39,11 @@ export class ServoController { //need a unique one of these for each pwmControll
 		const offTime = mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max);
 
 		this.pwmControllerOutput.setPWM(channel, onTime, offTime);
+		console.log("set angle", onTime, offTime);
 
+		if(channel === 6) {
+			return;
+		}
 		// disable the servo after it has moved
 		// per sparkfun: the servo can move 60° at a speed of .16 seconds with no load
 		// https://www.sparkfun.com/servos

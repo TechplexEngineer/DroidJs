@@ -134,7 +134,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 export const startup = async (): Promise<App.Locals> => {
 
 	console.log('Startup cwd:', process.cwd());
-	console.log('startup env', process.env)
+	// console.log('startup env', process.env)
 
 	const stick = new Joystick('/dev/input/js0', { mappingFn: LogitechF310Mapper.eventMapper });
 	const js = new JoystickCache(stick, LogitechF310Mapper);
@@ -236,6 +236,7 @@ export const startup = async (): Promise<App.Locals> => {
 		soundPlayer: player,
 		scriptMgr: scriptMgr,
 		db: filedb,
+		config: configDb,
 		servoMgr: servoDome, // somday we will have a servo manager to handle the two servo controllers
 	}
 };

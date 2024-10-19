@@ -4,8 +4,6 @@
 	export let callback = (success: boolean) => {
 		show = !show;
 	};
-
-	$: console.log('show', show);
 </script>
 
 <div class="modal modal-xl fade" class:show class:d-block={show} tabindex="-1">

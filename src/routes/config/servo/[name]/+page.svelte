@@ -5,13 +5,25 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+    let setAngleForm: HTMLFormElement;
+
+    let home = data.servo.home;
+    let min = data.servo.min;
+    let max = data.servo.max;
 </script>
 
 <h1>Servo Editor: <small>{data.servo.name}</small></h1>
 
-<!-- {JSON.stringify(data)} -->
+<!-- <pre>
+{JSON.stringify(data, null, 2)}
+</pre> -->
 
-<form action="?/setAngle" use:enhance>
+<!-- <form action="?/setAngle" method="POST" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }}>
     <div class="mb-3">
         <label class="form-label" for="" >Channel</label>
         <input class="form-control" type="number" name="channel" value={data.servo.channel}>
@@ -21,9 +33,69 @@
         <input class="form-control" type="number" name="value">
     </div>
     <button class="btn btn-primary mt-3" type="submit">Set</button>
+</form> -->
+
+
+<form action="?/setAngle" method="POST" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }} bind:this={setAngleForm}>
+    <input type="hidden" name="channel" bind:value={data.servo.channel}>
+    <div class="d-flex">
+        <RangeInput label="Min" name="value" value={min} class="flex-grow-1"/>
+        <div class="ms-2 mt-3">
+            <button class="btn btn-primary mt-3" type="submit">Go To</button>
+        </div>
+    </div>
 </form>
 
-<!-- <RangeInput label="Current" value={data.servo.home} /> -->
+<form action="?/setAngle" method="POST" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }} bind:this={setAngleForm}>
+    <input type="hidden" name="channel" bind:value={data.servo.channel}>
+    <div class="d-flex">
+        <RangeInput label="Max" name="value" value={max} class="flex-grow-1"/>
+        <div class="ms-2 mt-3">
+            <button class="btn btn-primary mt-3" type="submit">Go To</button>
+        </div>
+    </div>
+</form>
+
+<form action="?/setAngle" method="POST" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }} bind:this={setAngleForm}>
+    <input type="hidden" name="channel" bind:value={data.servo.channel}>
+    <div class="d-flex">
+        <RangeInput label="Home" name="value" value={home} class="flex-grow-1"/>
+        <div class="ms-2 mt-3">
+            <button class="btn btn-primary mt-3" type="submit">Go To</button>
+        </div>
+    </div>
+</form>
+
+<form action="?/save" method="POST" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }} bind:this={setAngleForm}>
+    <input type="hidden" name="min" value={min}/>
+    <input type="hidden" name="max" value={max}/>
+    <input type="hidden" name="home" value={home}/>
+    <input type="hidden" name="name" value={data.servo.name}/>
+    <input type="hidden" name="channel" bind:value={data.servo.channel}>
+    <div class="d-flex">
+        
+        <div>
+            <button type="submit" class="btn btn-success mt-3">Save</button>
+        </div>
+    </div>
+</form> 
+
 <!-- <RangeInput label="Max" />
 <RangeInput label="Home" /> -->
 

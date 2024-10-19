@@ -5,11 +5,10 @@ export type servoConfig = {
     name: string,
     hardware: string,
     channel: number,
-    // minPos: number,
-    // maxPos: number,
-    homePos: number
-
-}[];
+    min: number,
+    max: number,
+    home: number
+};
 
 
 // given an action (drive Fwd) look up what joystick and button or axis to use
@@ -32,13 +31,27 @@ export class ConfigDb {
         this.db = db;
     }
 
-    async getServos(): Promise<servoConfig> {
+    async getServos(): Promise<servoConfig[]> {
         const data = await this.db.read()
-        return data['servos'] as servoConfig || {};
+        return data['servos'] as servoConfig[] || {};
     }
 
     async getControllerMap(): Promise<ControllerMap> {
         const data = await this.db.read()
         return data['controllerMap'] as ControllerMap || {};
+    }
+
+    async updateServoByName(name: string, data: Partial<servoConfig>) {
+        const servos = await this.getServos();
+        const index = servos.findIndex((s) => s.name == name);
+        if (index == -1) {
+            throw new Error(`Servo not found: ${name}`);
+        }
+        servos[index] = { ...servos[index], ...data };
+        console.log("Servos", servos)
+        await this.db.update((d) => {
+            d['servos'] = servos;
+            return d;
+        });
     }
 }
