@@ -7,7 +7,7 @@ export class PwmMotorController {
     maxPulseUs: number;
     frequencyHz: number;
 
-    constructor(pwmOut: PwmOutput, minPulseUs = 750, maxPulseUs = 2250, frequencyHz = 50) {
+    constructor(pwmOut: PwmOutput, minPulseUs = 1000, maxPulseUs = 2000, frequencyHz = 50) {
         this.pwmControllerOutput = pwmOut;
         this.minPulseUs = minPulseUs;
         this.maxPulseUs = maxPulseUs;
@@ -16,10 +16,11 @@ export class PwmMotorController {
 
     // speed is a number between -1 and 1
     setSpeed(channel: number, speed: number) {
+        // console.log(`${" ".repeat(channel * 4)} ${channel} setSpeed`, speed);
         speed = clamp(speed, -1, 1);
 
         const pulseWidth = mapRange(speed, -1, 1, this.minPulseUs, this.maxPulseUs);
-
+        // console.log(`${" ".repeat(channel * 4)} ${channel} pulseWidth`, pulseWidth);
         const usPerSecond = 1_000_000;
         const oneCycleUs = usPerSecond / this.frequencyHz;
 
@@ -27,6 +28,7 @@ export class PwmMotorController {
         const pca9685Max = 4095;
         const onTime = 0;
         const offTime = mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max);
+        // console.log(`${" ".repeat(channel * 4)} ${channel} offTime`, offTime);
 
         this.pwmControllerOutput.setPWM(channel, onTime, offTime);
     }

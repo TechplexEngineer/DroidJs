@@ -37,8 +37,8 @@ export const sleepHandler: ScriptHandler = async (args: string[], handlerName: s
             console.log('Invalid random sleep arguments, must have min and max');
             return;
         }
-        const min = parseInt(args[1]);
-        const max = parseInt(args[2]);
+        const min = parseFloat(args[1])*1000;
+        const max = parseFloat(args[2])*1000;
         if (isNaN(min) || isNaN(max)) {
             console.log('Invalid random sleep arguments, min and max must be numbers');
             return;
@@ -47,7 +47,7 @@ export const sleepHandler: ScriptHandler = async (args: string[], handlerName: s
         await delay(delayTime);
         return;
     }
-    const delayTime = parseInt(args[0]) * 1000;
+    const delayTime = parseFloat(args[0]) * 1000;
     if (isNaN(delayTime)) {
         console.log(`Invalid delay time: ${args[0]}`);
         return;

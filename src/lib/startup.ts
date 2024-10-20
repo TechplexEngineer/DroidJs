@@ -129,7 +129,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 	}
 };
 
-
+const motorFreq = 45;
 
 export const startup = async (): Promise<App.Locals> => {
 
@@ -167,9 +167,9 @@ export const startup = async (): Promise<App.Locals> => {
 
 	const pcaBody = new PCA9685(con, 0x40);
 	await pcaBody.init();
-	await pcaBody.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
+	await pcaBody.setPWMFreq(motorFreq); //should be 50 per spark datasheet, 60 does not work
 	const motorBody = new PwmMotorController(pcaBody);
-	const servoBody = new ServoController(pcaBody);
+	// const servoBody = new ServoController(pcaBody);
 
 	const pcaDome = new PCA9685(con, 0x41);
 	await pcaDome.init();
@@ -195,7 +195,8 @@ export const startup = async (): Promise<App.Locals> => {
 		if (hardware == "Dome Servos"){
 			servoDome.setAngle(channel, home ?? 0);
 		} else if (hardware == "Body Servos"){
-			servoBody.setAngle(channel, home ?? 0);
+			console.log()
+			// servoBody.setAngle(channel, home ?? 0);
 		} else {
 			console.log('Unknown servo hardware:', hardware);
 		}
@@ -208,7 +209,7 @@ export const startup = async (): Promise<App.Locals> => {
 	console.log('Script dir:', scriptDirPath);
 
 	const domeHandler = new ServoHandler(servoDome, configDb);
-	const bodyHandler = new ServoHandler(servoBody, configDb);
+	// const bodyHandler = new ServoHandler(servoBody, configDb);
 	const soundHandler = new SoundHandler(player);
 
 	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {
@@ -219,7 +220,7 @@ export const startup = async (): Promise<App.Locals> => {
 		sleep: sleepHandler,
 		msSleep: msSleepHandler,
 		dome: domeHandler.handler.bind(domeHandler),
-		body: bodyHandler.handler.bind(bodyHandler),
+		// body: bodyHandler.handler.bind(bodyHandler),
 		rseries: async (args, handlerName) => {
 			astropixels.SendRaw(args[0])
 		}

@@ -20,11 +20,11 @@ export class ServoController { //need a unique one of these for each pwmControll
 		this.maxAngle = maxAngle;
 	}
 
-	public setAngle(channel: number, targetAngle: number, allowOutOfBounds = false) {
+	private setAngleNoDisable(channel: number, targetAngle: number, allowOutOfBounds = false) {
 		if (!allowOutOfBounds) {
 			targetAngle = clamp(targetAngle, this.minAngle, this.maxAngle);
 		}
-		const startingAngle = this.servoLocationCache.get(channel) || 0;
+		
 		this.servoLocationCache.set(channel, targetAngle);
 
 		const pulseWidth = mapRange(targetAngle, this.minAngle, this.maxAngle, this.minPulseUs, this.maxPulseUs);
@@ -38,6 +38,12 @@ export class ServoController { //need a unique one of these for each pwmControll
 		const offTime = Math.round(mapRange(pulseWidth, 0, oneCycleUs, pca9685Min, pca9685Max));
 
 		this.pwmControllerOutput.setPWM(channel, onTime, offTime);
+	}
+
+	public setAngle(channel: number, targetAngle: number, allowOutOfBounds = false) {
+		const startingAngle = this.servoLocationCache.get(channel) || 0;
+
+		this.setAngleNoDisable(channel, targetAngle, allowOutOfBounds);
 
 		// disable the servo after it has moved
 		// per sparkfun: the servo can move 60° at a speed of .16 seconds with no load
@@ -58,14 +64,14 @@ export class ServoController { //need a unique one of these for each pwmControll
 
 			const currentAngle = mapRange(progress, 0, 1, startingPos, targetAngle);
 
-			this.setAngle(channel, currentAngle >= targetAngle ? targetAngle : currentAngle);
+			this.setAngleNoDisable(channel, currentAngle >= targetAngle ? targetAngle : currentAngle);
 
 			if (progress >= 1) {
 				clearInterval(id); //is id this properly captured by the closure?
 				this.disable(channel);
 			}
 
-		}, 50); //move in 50ms steps
+		}, 25); //move in _ms steps
 	}
 
 	public disable(channel: number) {
