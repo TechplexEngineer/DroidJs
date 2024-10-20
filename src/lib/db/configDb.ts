@@ -48,7 +48,7 @@ export class ConfigDb {
             throw new Error(`Servo not found: ${name}`);
         }
         servos[index] = { ...servos[index], ...data };
-        console.log("Servos", servos)
+
         await this.db.update((d) => {
             d['servos'] = servos;
             return d;

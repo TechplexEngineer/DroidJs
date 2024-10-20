@@ -6,7 +6,7 @@ export class Astropixels {
     private address: number;
     private bus: PromisifiedBus;
 
-    constructor(connection: PromisifiedBus, address = 0x20) {
+    constructor(connection: PromisifiedBus, address = 0x0A) {
         this.address = address;
         this.bus = connection;
     }

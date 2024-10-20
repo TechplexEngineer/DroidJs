@@ -8,7 +8,7 @@ export const load = (async ({ locals, params }) => {
 
     let servo = config.servos.find((s)=>s.name == params.name);
 
-    let current = locals.servoMgr.getCurrentLocaton(servo.channel);
+    let current = locals.servoMgr.getCurrentLocation(servo.channel);
 
     servo.current = current;
 

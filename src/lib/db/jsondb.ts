@@ -14,7 +14,7 @@ export class FileDb {
     }
 
     async update(updateFn: (data: Record<string, any>) => Record<string, any>) {
-        const data = this.read();
+        const data = await this.read();
         const updatedData = updateFn(data);
         await fs.writeFile(this.filePath, JSON.stringify(updatedData, null, 2));
     }

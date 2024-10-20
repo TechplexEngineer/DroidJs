@@ -14,7 +14,7 @@ import { browser, building, dev, version } from '$app/environment';
 import os from 'os';
 import { ScriptRunnerManager } from './script/ScriptRunnerManager';
 import { SoundHandler } from './script/handlers/soundHandler';
-import { sleepHandler } from './script/handlers/sleepHandler';
+import { msSleepHandler, sleepHandler } from './script/handlers/sleepHandler';
 import { ServoHandler } from './script/handlers/servoHandler';
 
 const isRaspberryPi = os.arch() === 'arm64' && os.platform() === 'linux';
@@ -190,13 +190,12 @@ export const startup = async (): Promise<App.Locals> => {
 	
 	// at startup set all servos to home pos
 	const servos = await configDb.getServos();
-	console.log('Servos:', servos);
 
-	for (const { hardware, channel, homePos } of servos) {
+	for (const { hardware, channel, home } of servos) {
 		if (hardware == "Dome Servos"){
-			servoDome.setAngle(channel, homePos ?? 0);
+			servoDome.setAngle(channel, home ?? 0);
 		} else if (hardware == "Body Servos"){
-			servoBody.setAngle(channel, homePos ?? 0);
+			servoBody.setAngle(channel, home ?? 0);
 		} else {
 			console.log('Unknown servo hardware:', hardware);
 		}
@@ -208,14 +207,22 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 	console.log('Script dir:', scriptDirPath);
 
+	const domeHandler = new ServoHandler(servoDome, configDb);
+	const bodyHandler = new ServoHandler(servoBody, configDb);
+	const soundHandler = new SoundHandler(player);
+
 	const scriptMgr = new ScriptRunnerManager(scriptDirPath, {
 		default: async (args, handlerName) => {
 			console.log('No handler found for:', handlerName);
 		},
-		sound: new SoundHandler(player).handler,
+		sound: soundHandler.handler.bind(soundHandler),
 		sleep: sleepHandler,
-		dome: new ServoHandler(servoDome, configDb).handler,
-		body: new ServoHandler(servoBody, configDb).handler,
+		msSleep: msSleepHandler,
+		dome: domeHandler.handler.bind(domeHandler),
+		body: bodyHandler.handler.bind(bodyHandler),
+		rseries: async (args, handlerName) => {
+			astropixels.SendRaw(args[0])
+		}
 	});
 
 

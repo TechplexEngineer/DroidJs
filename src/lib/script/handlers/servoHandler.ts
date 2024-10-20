@@ -13,22 +13,30 @@ export class ServoHandler implements Handler {
     }
 
     async handler(args: string[], handlerName: string) {
-        if (args.length !== 2) {
-            console.log('Invalid servo arguments, must have servo number and angle');
+        if (![2,3].includes(args.length)) {
+            console.log('Invalid servo arguments, must have servo name and angle', args);
             return;
         }
         const servoName = args[0] as string;
-        const angle = parseInt(args[1]);
-        if (isNaN(angle)) {
-            console.log('Invalid servo arguments, servo number and angle must be numbers');
+        const arg1 = parseInt(args[1]);
+        if (isNaN(arg1)) {
+            console.log('Invalid servo arguments, servo name and angle must be numbers', args);
             return;
         }
+        const open = arg1 === 1
         const servos = await this.config.getServos();
-        if (!servos[servoName]) {
-            console.log(`servo named ${servoName} does not exist in confg`);
+        const servo = servos.find(servo => servo.name === servoName);
+        if (!servo) {
+            console.log(`servo named ${servoName} does not exist in config`);
+            return;
+        }
+        const angle = open ? servo.max : servo.min;
+        if (args.length === 3) {
+            const duration = parseInt(args[2]);
+            this.servoController.setAngleSlow(servo.channel, angle, duration);
             return;
         }
 
-        this.servoController.setAngle(servos[servoName].channel, angle);
+        this.servoController.setAngle(servo.channel, angle);
     }
 }

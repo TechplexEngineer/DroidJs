@@ -31,7 +31,6 @@ export class ScriptRunner {
             }
             const line = Papa.parse<string[]>(csvLine, { comments: '#' });
             if (line.data.length === 0) {
-                console.log('Skipping line: ', csvLine);
                 continue;
             }
             await this.processLine(line.data[0]);

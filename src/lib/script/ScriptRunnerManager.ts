@@ -15,9 +15,11 @@ export class ScriptRunnerManager {
     async runScript(scriptName: string) {
         const scriptPath = `${this.scriptDirectory}/${scriptName}`;
         const scriptRunner = new ScriptRunner(scriptPath, this.handlers);
+        console.log("Running script:", scriptName);
         this.runners.set(scriptName, scriptRunner);
         await scriptRunner.run();
         this.runners.delete(scriptName);
+        console.log("Done script:", scriptName);
     }
     
     getRunningScripts() {

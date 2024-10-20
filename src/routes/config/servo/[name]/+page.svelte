@@ -43,7 +43,7 @@
   }} bind:this={setAngleForm}>
     <input type="hidden" name="channel" bind:value={data.servo.channel}>
     <div class="d-flex">
-        <RangeInput label="Min" name="value" value={min} class="flex-grow-1"/>
+        <RangeInput label="Min" name="value" bind:value={min} class="flex-grow-1"/>
         <div class="ms-2 mt-3">
             <button class="btn btn-primary mt-3" type="submit">Go To</button>
         </div>
@@ -57,7 +57,7 @@
   }} bind:this={setAngleForm}>
     <input type="hidden" name="channel" bind:value={data.servo.channel}>
     <div class="d-flex">
-        <RangeInput label="Max" name="value" value={max} class="flex-grow-1"/>
+        <RangeInput label="Max" name="value" bind:value={max} class="flex-grow-1"/>
         <div class="ms-2 mt-3">
             <button class="btn btn-primary mt-3" type="submit">Go To</button>
         </div>
@@ -71,7 +71,7 @@
   }} bind:this={setAngleForm}>
     <input type="hidden" name="channel" bind:value={data.servo.channel}>
     <div class="d-flex">
-        <RangeInput label="Home" name="value" value={home} class="flex-grow-1"/>
+        <RangeInput label="Home" name="value" bind:value={home} class="flex-grow-1"/>
         <div class="ms-2 mt-3">
             <button class="btn btn-primary mt-3" type="submit">Go To</button>
         </div>
@@ -83,10 +83,10 @@
       update({ reset: false });
     };
   }} bind:this={setAngleForm}>
-    <input type="hidden" name="min" value={min}/>
-    <input type="hidden" name="max" value={max}/>
-    <input type="hidden" name="home" value={home}/>
-    <input type="hidden" name="name" value={data.servo.name}/>
+    <input type="hidden" name="min" bind:value={min}/>
+    <input type="hidden" name="max" bind:value={max}/>
+    <input type="hidden" name="home" bind:value={home}/>
+    <input type="hidden" name="name" bind:value={data.servo.name}/>
     <input type="hidden" name="channel" bind:value={data.servo.channel}>
     <div class="d-flex">
         

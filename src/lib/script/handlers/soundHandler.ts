@@ -14,7 +14,7 @@ export class SoundHandler implements Handler {
     async handler(args: string[], handlerName: string): Promise<void> {
         if (args.length === 1) {
             const fileName = args[0];
-            this.player.playSound(fileName);
+            this.player.playSoundMatch(fileName);
             return;
         }
         if (args.length === 2 && args[0].toLowerCase() == "random") {

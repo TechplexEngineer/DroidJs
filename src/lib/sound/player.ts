@@ -41,6 +41,7 @@ export class SoundPlayer {
                 this.process = spawn('mpg321', ["-q", filePath, '-g', `${this.volume}`]);
                 // console.log('mpg321', ["-q", filePath, '-g', `${this.volume}`])
             } else {
+                //afplay is the macos sound player
                 this.process = spawn('afplay', [filePath, '-v', `${this.volume}`]);
             }
 
@@ -73,6 +74,16 @@ export class SoundPlayer {
                 resolve();
             });
         });
+    }
+
+    async playSoundMatch(filename: string) {
+        const sounds = await this.listSounds();
+        const matches = this.matcher.filter(sounds, filename);
+        if (!matches || matches.length === 0) {
+            console.log(`No matches for ${filename}`);
+            return;
+        }
+        this.playSound(sounds[matches[0]]);
     }
 
     stop() {
