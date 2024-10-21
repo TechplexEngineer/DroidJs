@@ -49,6 +49,12 @@
       "buttonOrAxisName": "B",
       "type": "sound",
       "category": "razz"
+    },
+    "domeTest": {
+      "joystickName": "js0",
+      "buttonOrAxisName": "RIGHT_STICK_BUTTON",
+      "type": "script",
+      "name": "test.scr"
     }
   },
   "hardware": [

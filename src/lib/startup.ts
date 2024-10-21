@@ -41,7 +41,14 @@ let controllerMapCache: ControllerMap | null = null;
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
 
-export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
+export const setupEventHandlers = async (
+	js: JoystickCache,
+	configDb: ConfigDb,
+	controllerMapCache: ControllerMap,
+	player: SoundPlayer,
+	motor: PwmMotorController,
+	scriptMgr: ScriptRunnerManager
+) => {
 	console.log('setupEventHandlers');
 	js.removeAllListeners();
 	if (driveIntervalHandle) {
@@ -85,7 +92,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 		if (ev.value !== 1) return; // only when button pressed
 
 		controllerMapCache = await configDb.getControllerMap();
-		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+		await setupEventHandlers(js, configDb, controllerMapCache, player, motor, scriptMgr);
 		console.log('Controller map reloaded:', controllerMapCache);
 	});
 
@@ -126,6 +133,21 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 				await player.playRandomSound(value.category || null);
 			});
 		}
+	}
+
+	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "script")) {
+		console.log('Setting up script event:', value);
+
+		const scriptName = value.name;
+		if (!scriptName) {
+			return;
+		}
+		js.on(value.buttonOrAxisName, async (ev) => {
+			if (ev.value !== 1) { // only when button pressed, not released
+				return;
+			}
+			await scriptMgr.runScript(scriptName);
+		});
 	}
 };
 
@@ -236,7 +258,7 @@ export const startup = async (): Promise<App.Locals> => {
 		console.log('update', JSON.stringify(ev));
 	});
 
-	setupEventHandlers(js, configDb, controllerMapCache, player, motorBody);
+	setupEventHandlers(js, configDb, controllerMapCache, player, motorBody, scriptMgr);
 
 
 	return {
