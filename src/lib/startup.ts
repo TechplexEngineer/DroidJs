@@ -31,12 +31,6 @@ const PortMapping = {
 	dome: 3,
 }
 
-if (import.meta.hot) {
-	console.log('Hot reload enabled');
-	import.meta.hot.accept(() => {
-		console.log('reload!');
-	});
-}
 let controllerMapCache: ControllerMap | null = null;
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
@@ -171,12 +165,19 @@ export const startup = async (): Promise<App.Locals> => {
 	const motorBody = new PwmMotorController(pcaBody);
 	const servoBody = new ServoController(pcaBody);
 
+	if (!isRaspberryPi) {
+		// lets mock out setAngle and log what gets set
+		servoBody.setAngle = (channel: number, targetAngle: number, allowOutOfBounds = false) => {
+			console.log('Servo setAngle:', channel, targetAngle);
+		}
+	}
+
 	const pcaDome = new PCA9685(con, 0x41);
 	await pcaDome.init();
 	await pcaDome.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
 	const servoDome = new ServoController(pcaDome);
 
-	
+
 	const astropixels = new Astropixels(con);
 
 	let soundDirPath = "./sounds";
@@ -187,14 +188,14 @@ export const startup = async (): Promise<App.Locals> => {
 
 	const player = new SoundPlayer(soundDirPath)
 
-	
+
 	// at startup set all servos to home pos
 	const servos = await configDb.getServos();
 
 	for (const { hardware, channel, home } of servos) {
-		if (hardware == "Dome Servos"){
+		if (hardware == "Dome Servos") {
 			servoDome.setAngle(channel, home ?? 0);
-		} else if (hardware == "Body Servos"){
+		} else if (hardware == "Body Servos") {
 			servoBody.setAngle(channel, home ?? 0);
 		} else {
 			console.log('Unknown servo hardware:', hardware);
@@ -248,7 +249,7 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 };
 
-const initHardware = (configDb: ConfigDb):Record<string, any> => {
+const initHardware = (configDb: ConfigDb): Record<string, any> => {
 
 	return {};
 }
