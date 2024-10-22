@@ -1,4 +1,5 @@
-import { groupSounds, type SoundPlayer } from "$lib/sound/player";
+import { groupSounds } from "$lib/sound/groupSounds";
+import { type SoundPlayer } from "$lib/sound/player";
 import type { Handler } from "./iHandler";
 import path from 'path';
 
