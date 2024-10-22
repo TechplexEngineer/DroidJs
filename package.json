@@ -47,6 +47,7 @@
 		"ioctl": "^2.0.2",
 		"papaparse": "^5.4.1",
 		"sass": "1.77.6",
+		"svelte-french-toast": "^1.2.0",
 		"sveltekit-sse": "^0.13.5"
 	}
 }

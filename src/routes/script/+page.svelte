@@ -3,6 +3,7 @@
 	import uFuzzy from '@leeoniya/ufuzzy';
 	import type { PageData } from './$types';
 	import { debounce } from '$lib/utils/debounce';
+	import toast from 'svelte-french-toast';
 
 	export let data: PageData;
 	const matcher = new uFuzzy({});
@@ -36,7 +37,39 @@
 		content="Scripts to animate your droids motion with DroidJs Droid Control Software"
 	/>
 </svelte:head>
-<h1>Script Library</h1>
+
+<div class="d-flex justify-content-between">
+	<div></div>
+	<h1>Script Library</h1>
+	<div>
+		<form
+			action="?/stop"
+			method="POST"
+			use:enhance={() => {
+				let doneHandler;
+				toast.promise(
+					new Promise((resolve, reject) => {
+						doneHandler = async ({ result }) => {
+							console.log('done');
+							console.log(result);
+							resolve('Test');
+						};
+					}),
+					{
+						loading: 'Stopping...',
+						success: 'All scripts stopped!',
+						error: 'Could not stop.'
+					}
+				);
+
+				console.log('starting');
+				return doneHandler;
+			}}
+		>
+			<button class="btn btn-warning" type="submit">Stop All</button>
+		</form>
+	</div>
+</div>
 
 <div class="mb-3">
 	<input
