@@ -4,6 +4,8 @@
 	import type { PageData } from './$types';
 	import { debounce } from '$lib/utils/debounce';
 	import toast from 'svelte-french-toast';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import ActionButton from '$lib/components/ActionButton.svelte';
 
 	export let data: PageData;
 	const matcher = new uFuzzy({});
@@ -38,38 +40,16 @@
 	/>
 </svelte:head>
 
-<div class="d-flex justify-content-between">
-	<div></div>
-	<h1>Script Library</h1>
-	<div>
-		<form
-			action="?/stop"
-			method="POST"
-			use:enhance={() => {
-				let doneHandler;
-				toast.promise(
-					new Promise((resolve, reject) => {
-						doneHandler = async ({ result }) => {
-							console.log('done');
-							console.log(result);
-							resolve('Test');
-						};
-					}),
-					{
-						loading: 'Stopping...',
-						success: 'All scripts stopped!',
-						error: 'Could not stop.'
-					}
-				);
-
-				console.log('starting');
-				return doneHandler;
-			}}
-		>
-			<button class="btn btn-warning" type="submit">Stop All</button>
-		</form>
-	</div>
-</div>
+<PageHeader title="Script Library">
+	<ActionButton
+		action="?/stop"
+		loading="Stopping..."
+		success="All scripts stopped!"
+		error="Could not stop scripts"
+		actionLabel="Stop All"
+		btnClass="btn-warning"
+	/>
+</PageHeader>
 
 <div class="mb-3">
 	<input
@@ -94,8 +74,8 @@
 	{/each}
 </div>
 
-<style>
-	tbody tr {
-		cursor: pointer;
+<style lang="scss">
+	.card:hover {
+		background-color: #eee;
 	}
 </style>

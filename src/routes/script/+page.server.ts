@@ -1,4 +1,5 @@
 import { delay } from '$lib/utils/delay';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
