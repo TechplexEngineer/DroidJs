@@ -21,7 +21,7 @@ export class ScriptRunnerManager {
         this.runners.delete(scriptName);
         console.log("Done script:", scriptName);
     }
-    
+
     getRunningScripts() {
         return this.runners.keys();
     }
@@ -34,6 +34,7 @@ export class ScriptRunnerManager {
 
     async listScripts() {
         const listing = await fs.readdir(this.scriptDirectory, { recursive: true });
-        return listing.filter((file) => file.endsWith('.scr'));
+        return listing.filter((file) => file.endsWith('.scr'))
+            .map(file => file.slice(0, file.lastIndexOf(".scr")));
     }
 }
