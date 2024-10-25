@@ -15,7 +15,6 @@
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.0.0",
-		"@neoconfetti/svelte": "^2.0.0",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
@@ -47,6 +46,7 @@
 		"ioctl": "^2.0.2",
 		"papaparse": "^5.4.1",
 		"sass": "1.77.6",
+		"svelte-french-toast": "^1.2.0",
 		"sveltekit-sse": "^0.13.5"
 	}
 }

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import '../app.css';
 	import '../app.scss';
+	import { Toaster } from 'svelte-french-toast';
 	// import './styles.css';
 
 	import Header from '../lib/components/Header.svelte';
@@ -19,6 +20,8 @@
 		// const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
 	});
 </script>
+
+<Toaster />
 
 <div class="app">
 	<Header />

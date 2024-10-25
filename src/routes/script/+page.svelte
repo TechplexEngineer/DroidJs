@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import uFuzzy from '@leeoniya/ufuzzy';
 	import type { PageData } from './$types';
+	import { debounce } from '$lib/utils/debounce';
+	import toast from 'svelte-french-toast';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import ActionButton from '$lib/components/ActionButtonToast.svelte';
+	import SearchableGridLayout from '$lib/components/SearchableGridLayout.svelte';
 
 	export let data: PageData;
 </script>
@@ -12,16 +18,16 @@
 		content="Scripts to animate your droids motion with DroidJs Droid Control Software"
 	/>
 </svelte:head>
-<h1>Script Library</h1>
 
-{#each data.files as file}
-	<ul>
-		<li>
-			<form method="POST" action="?/run" use:enhance>
-				{file}
-				<input type="hidden" name="filename" value={file} />
-				<button type="submit" class="btn btn-outline-primary">Run</button>
-			</form>
-		</li>
-	</ul>
-{/each}
+<PageHeader title="Script Library">
+	<ActionButton
+		action="?/stop"
+		loading="Stopping..."
+		success="All scripts stopped!"
+		error="Could not stop scripts"
+		actionLabel="Stop All"
+		btnClass="btn-warning"
+	/>
+</PageHeader>
+
+<SearchableGridLayout items={data.files} />

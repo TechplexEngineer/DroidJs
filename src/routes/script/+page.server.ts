@@ -1,6 +1,8 @@
+import { delay } from '$lib/utils/delay';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({locals}) => {
+export const load = (async ({ locals }) => {
     return {
         files: await locals.scriptMgr.listScripts()
     };
@@ -16,5 +18,9 @@ export const actions = {
         console.log('Running script:', filename);
         locals.scriptMgr.runScript(filename);
     },
-    
+    stop: async ({ locals }) => {
+        locals.scriptMgr.stopAllScripts();
+        await delay(250); // need to wait for current script loops to stop
+    }
+
 } satisfies Actions;

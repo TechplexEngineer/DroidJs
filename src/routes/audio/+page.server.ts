@@ -1,3 +1,4 @@
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
@@ -28,5 +29,13 @@ export const actions = {
             return;
         }
         locals.soundPlayer.setVolume(parseInt(volume));
+    },
+    playRandom: async ({ locals, request }) => {
+        const data = await request.formData();
+        const cagegory = data.get('category')?.toString();
+        if (!cagegory) {
+            return fail(400, { message: "category is required" });
+        }
+        return { message: await locals.soundPlayer.playRandomSound(cagegory) };
     }
 } satisfies Actions;

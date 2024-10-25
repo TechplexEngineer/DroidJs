@@ -4,6 +4,7 @@ import path from 'path';
 import os from 'os';
 import uFuzzy from '@leeoniya/ufuzzy';
 import { clamp } from '$lib/utils/math';
+import { groupSounds } from './groupSounds';
 
 const isMac = os.type() === 'Darwin' || os.type().indexOf('Windows') > -1;
 
@@ -30,8 +31,8 @@ export class SoundPlayer {
 
     // HUM__014.mp3
     async playSound(filename: string) {
-        
-        
+
+
         return new Promise<void>((resolve, _reject) => {
             this.stop();
 
@@ -101,13 +102,14 @@ export class SoundPlayer {
 
     async playRandomSound(category: string | null) {
         console.log('Playing random sound', category);
-        
+
         const sounds = await this.listSounds();
 
-        if (category == null || category== "any") {
+        if (category == null || category == "any") {
             const randomIndex = Math.floor(Math.random() * sounds.length);
             const randomSound = sounds[randomIndex];
-            return await this.playSound(randomSound);
+            await this.playSound(randomSound);
+            return randomSound;
         }
 
         const grouped = groupSounds(sounds);
@@ -123,38 +125,10 @@ export class SoundPlayer {
         if (groupName) {
             const randomIndex = Math.floor(Math.random() * grouped[groupName].length);
             const randomSound = grouped[groupName][randomIndex];
-            await this.playSound(`${groupName}/${randomSound}`);
+            const path = `${groupName}/${randomSound}`;
+            await this.playSound(path);
+            return path;
         }
     }
 }
 
-export const groupSounds = (sounds: string[]) => {
-
-    // data contains a list of files and the directory they are store in
-    // split the filename on / and group by prefix
-    // SENT/SENT_001.mp3 => {'SENT': ['SENT_001.mp3']}
-    // SOUND/SENT/SENT_001.mp3 => {'SOUND': {'SENT': ['SENT_001.mp3']}}
-
-    const grouped = sounds.reduce(
-        (acc, file) => {
-            const parts = file.split('/');
-            // console.log('parts', parts);
-            if (parts.length == 1) {
-                if (!acc['']) {
-                    acc[''] = [];
-                }
-                acc[''].push(parts[0]);
-                return acc;
-            } else {
-                const [prefix, ...rest] = parts;
-                if (!acc[prefix]) {
-                    acc[prefix] = [];
-                }
-                acc[prefix].push(rest.join('/'));
-                return acc;
-            }
-        },
-        {} as Record<string, string[]>
-    );
-    return grouped;
-}
