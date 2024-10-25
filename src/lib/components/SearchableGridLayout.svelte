@@ -25,8 +25,6 @@
 	}, 250);
 
 	$: deb(filterValue);
-
-	export let categories: string[] | undefined;
 </script>
 
 <div class="input-group mb-3">
@@ -58,21 +56,6 @@
 		</svg>
 	</button>
 </div>
-
-{#if categories}
-	<ul class="nav nav-pills">
-		{#each categories.filter((c) => c.length > 0) as category}
-			<button
-				class="btn btn-sm btn-outline-primary fs-6 me-1"
-				on:click={() => {
-					filterValue = category;
-				}}
-			>
-				{category}
-			</button>
-		{/each}
-	</ul>
-{/if}
 
 <div class="row row-cols-3">
 	{#each scriptFiles as file}

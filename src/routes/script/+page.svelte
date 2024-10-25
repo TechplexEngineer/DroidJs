@@ -5,7 +5,7 @@
 	import { debounce } from '$lib/utils/debounce';
 	import toast from 'svelte-french-toast';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import ActionButton from '$lib/components/ActionButton.svelte';
+	import ActionButton from '$lib/components/ActionButtonToast.svelte';
 	import SearchableGridLayout from '$lib/components/SearchableGridLayout.svelte';
 
 	export let data: PageData;

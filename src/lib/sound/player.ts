@@ -108,7 +108,8 @@ export class SoundPlayer {
         if (category == null || category == "any") {
             const randomIndex = Math.floor(Math.random() * sounds.length);
             const randomSound = sounds[randomIndex];
-            return await this.playSound(randomSound);
+            await this.playSound(randomSound);
+            return randomSound;
         }
 
         const grouped = groupSounds(sounds);
@@ -124,7 +125,9 @@ export class SoundPlayer {
         if (groupName) {
             const randomIndex = Math.floor(Math.random() * grouped[groupName].length);
             const randomSound = grouped[groupName][randomIndex];
-            await this.playSound(`${groupName}/${randomSound}`);
+            const path = `${groupName}/${randomSound}`;
+            await this.playSound(path);
+            return path;
         }
     }
 }
