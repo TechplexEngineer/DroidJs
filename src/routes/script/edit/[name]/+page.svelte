@@ -9,7 +9,7 @@
 	import toast from 'svelte-french-toast';
 	import type { Action } from 'svelte/action';
 
-	//@todo use actio
+	//@todo use action
 	const myEnhance: Action<HTMLFormElement, { loading: string; success: string; error: string }> = (
 		formElement,
 		{ loading, success, error }
