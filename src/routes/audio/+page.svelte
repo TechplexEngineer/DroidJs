@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import ActionButton from '$lib/components/ActionButtonToast.svelte';
-	import { actionEnhance, type ValOrFn } from '$lib/components/actionEnhance';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import SearchableGridLayout from '$lib/components/SearchableGridLayout.svelte';
 	import { groupSounds } from '$lib/sound/groupSounds';
@@ -13,17 +12,6 @@
 	let volumeForm: HTMLFormElement;
 
 	let categories = groupSounds(data.files);
-
-	const successFn: ValOrFn = (result) => {
-		const msg = `Played: ${result.data.message}`;
-		console.log(msg);
-		return msg;
-	};
-	const errorFn: ValOrFn = (result) => {
-		return result.data.message
-			? `Error: ${result.data.message}`
-			: 'Unable to play random sound';
-	};
 </script>
 
 <svelte:head>
@@ -68,8 +56,16 @@
 			<ActionButton
 				action="?/playRandom"
 				loading="Playing..."
-				success={successFn}
-				error={errorFn}
+				success={(result) => {
+					const msg = `Played: ${result.data.message}`;
+					console.log(msg);
+					return msg;
+				}}
+				error={(result) => {
+					return result.data.message
+						? `Error: ${result.data.message}`
+						: 'Unable to play random sound';
+				}}
 				actionLabel={category}
 				btnClass="btn-outline-primary"
 				title="Play random song"
@@ -82,7 +78,7 @@
 {/if}
 
 <SearchableGridLayout items={data.files} let:file>
-	<form method="POST" action="?/play" use:actionEnhance={({loading: "Playing...", success: successFn, error: errorFn})}>
+	<form method="POST" action="?/play" use:enhance>
 		<input type="hidden" name="filename" value={file} />
 		<button type="submit" class="btn btn-link text-reset text-decoration-none stretched-link"
 			>{file}</button

@@ -9,8 +9,7 @@ type Failure = Record<string, unknown> | undefined;
 export type ValOrFn = ValueOrFunction<Renderable, ActionResult> //string | ((arg: ActionResult<Success, Failure>) => string);
 
 export const actionEnhance: Action<HTMLFormElement, { loading: string; success: ValOrFn; error: ValOrFn }> = (formElement, params) => {
-    const submitFn: SubmitFunction<Success, Failure> = (
-    ) => {
+    const submitFn: SubmitFunction<Success, Failure> = () => {
         let doneHandler: ReturnType<SubmitFunction<Success, Failure>>;
         toast.promise(new Promise<ActionResult>((resolve, reject) => {
             doneHandler = async ({ result }) => {
@@ -28,7 +27,7 @@ export const actionEnhance: Action<HTMLFormElement, { loading: string; success: 
         return doneHandler;
     };
     // return submitFn
-    return enhance(formElement, submitFn);
+    return enhance(formElement, submitFn());
 }
 
 // export const actionEnhance: Action<HTMLFormElement, { loading: string; success: string; error: string }> = (
