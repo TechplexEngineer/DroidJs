@@ -7,6 +7,63 @@ import {
 	getNumButtons
 } from './joystick-ioctl';
 
+const exampleResult = [
+	{
+		"number": 0,
+		"path": "/dev/input/js0",
+		"name": "Logitech Gamepad F310",
+		"numButtons": 11,
+		"numAxes": 8,
+		"buttonMap": {
+		  "0": "BtnA",
+		  "1": "BtnB",
+		  "2": "BtnX",
+		  "3": "BtnY",
+		  "4": "BtnTL",
+		  "5": "BtnTR",
+		  "6": "BtnSelect",
+		  "7": "BtnStart",
+		  "8": "BtnMode",
+		  "9": "BtnThumbL",
+		  "10": "BtnThumbR"
+		},
+		"axisMap": {
+		  "0": "X",
+		  "1": "Y",
+		  "2": "Z",
+		  "3": "Rx",
+		  "4": "Ry",
+		  "5": "Rz",
+		  "6": "Hat0X",
+		  "7": "Hat0Y"
+		}
+	  },
+	  {
+		"number": 1,
+		"path": "/dev/input/js1",
+		"name": "Sony Navigation Controller",
+		"numButtons": 12,
+		"numAxes": 3,
+		"buttonMap": {
+		  "0": "BtnA",
+		  "1": "BtnB",
+		  "2": "BtnX",
+		  "3": "BtnY",
+		  "4": "BtnTL",
+		  "5": "BtnTL2",
+		  "6": "BtnMode",
+		  "7": "BtnThumbL"
+		},
+		"axisMap": {
+		  "0": "X",
+		  "1": "Y",
+		  "2": "Z"
+		}
+	  }
+	  
+	  
+];
+
 export const listJoysticks = async () => {
 	const devices = await fs.readdir('/dev/input');
 	const joysticks = devices.filter((d) => d.startsWith('js'));
@@ -24,10 +81,12 @@ export const listJoysticks = async () => {
 				buttonMap: getButtonMap(fh.fd),
 				axisMap: getAxisMap(fh.fd)
 			};
+			console.log(JSON.stringify(data, null, 2));
 			fh.close();
 			return data;
 		})
 	);
+	
 
 	// fs.open(DevicePath, 'r', function (err, fd) {
 	// 		if (err) {

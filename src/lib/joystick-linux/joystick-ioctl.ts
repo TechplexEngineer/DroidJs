@@ -107,7 +107,7 @@ export const getDeviceName = (fd: number) => {
 		throw new Error('ioctl failed');
 	}
 
-	const name = buffer.toString();
+	const name = buffer.toString().replace(/\0.*$/g,'');
 
 	return name;
 };
