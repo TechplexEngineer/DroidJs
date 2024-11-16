@@ -6,15 +6,5 @@ export const load = (async ({ locals }) => {
 
     return {
         joysticks: joysticks
-        // [
-        // 	({
-        // 		number: 0,
-        // 		name: 'test'
-        // 	},
-        // 	{
-        // 		number: 1,
-        // 		name: 'test2'
-        // 	})
-        // ]
     };
 }) satisfies PageServerLoad;

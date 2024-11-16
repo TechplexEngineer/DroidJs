@@ -1,4 +1,4 @@
-import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
+import { exec, spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
@@ -97,7 +97,38 @@ export class SoundPlayer {
     async listSounds() {
         console.log('Listing sounds in', this.soundDirectory);
         const listing = await fs.readdir(this.soundDirectory, { recursive: true });
-        return listing.filter((file) => file.toLowerCase().endsWith('.mp3'));
+        return listing.filter((file) =>
+            file.toLowerCase().endsWith('.mp3')
+        ).map(file =>
+            file//.replace(".mp3", "")
+        );
+    }
+
+    async getSoundLength(filename: string): Promise<number> {
+        const cmd = `ffprobe -i "${filename}" -show_entries format=duration -v quiet -of json`;
+        const res = await exec(cmd);
+
+        const stdoutStream = res.stdout;
+        if (!stdoutStream) {
+            throw new Error("Failed to get sound length: no stdout");
+        }
+
+        const stdout = await new Promise<string>((resolve, reject) => {
+            let data = '';
+            stdoutStream.on('data', (chunk) => {
+                data += chunk;
+            });
+            stdoutStream.on('end', () => {
+                resolve(data);
+            });
+            stdoutStream.on('error', (err) => {
+                reject(err);
+            });
+        });
+
+        const data = JSON.parse(await stdout);
+
+        return (data.format as number);
     }
 
     async playRandomSound(category: string | null) {

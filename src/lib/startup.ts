@@ -10,7 +10,6 @@ import { PwmMotorController } from './motion/pwmMotor';
 import { ServoController } from './motion/servoController';
 import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
-import { browser, building, dev, version } from '$app/environment';
 import os from 'os';
 import { ScriptRunnerManager } from './script/ScriptRunnerManager';
 import { SoundHandler } from './script/handlers/soundHandler';

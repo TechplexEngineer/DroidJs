@@ -3,15 +3,16 @@ import { createReadStream } from 'fs';
 import { JoystickStream } from './joystick-stream.js';
 import { parseEvent } from './parseEvent.js';
 import * as fs from 'node:fs/promises';
-import ioctl from 'ioctl';
-import {
-	getAxisMap,
-	getButtonMap,
-	getDeviceName,
-	getDriverVersion,
-	getNumAxes,
-	getNumButtons
-} from './joystick-ioctl.js';
+import os from 'os';
+// import ioctl from 'ioctl';
+// import {
+// 	getAxisMap,
+// 	getButtonMap,
+// 	getDeviceName,
+// 	getDriverVersion,
+// 	getNumAxes,
+// 	getNumButtons
+// } from './joystick-ioctl.js';
 
 export interface namedJsEvent extends jsEvent {
 	name: string;
@@ -88,8 +89,13 @@ export class Joystick extends EventEmitter<JsEvents> {
 
 			fileStream.pipe(new JoystickStream()).on('data', (b) => this.onData(b));
 		} catch (error) {
-			console.log('error tc', error);
+			console.log('JS Error Init Read Stream', error);
 			this.fileHandle?.close();
+			if (os.platform() == "linux") {
+				setTimeout(() => {
+					this.initReadStream(devicePath);
+				}, 500);
+			}
 		}
 	}
 
@@ -116,40 +122,44 @@ export class Joystick extends EventEmitter<JsEvents> {
 		this.fileHandle?.close();
 	}
 
-	public getDriverVersion() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getDriverVersion(this.fileHandle.fd);
+	public injectEvent(ev: jsEvent) {
+		this.emit('update', ev);
 	}
-	public getNumAxes() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getNumAxes(this.fileHandle.fd);
-	}
-	public getNumButtons() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getNumButtons(this.fileHandle.fd);
-	}
-	public getDeviceName() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getDeviceName(this.fileHandle.fd);
-	}
-	public getAxisMap() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getAxisMap(this.fileHandle.fd);
-	}
-	public getButtonMap() {
-		if (!this.fileHandle) {
-			throw new Error('File handle not initialized');
-		}
-		return getButtonMap(this.fileHandle.fd);
-	}
+
+	// public getDriverVersion() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getDriverVersion(this.fileHandle.fd);
+	// }
+	// public getNumAxes() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getNumAxes(this.fileHandle.fd);
+	// }
+	// public getNumButtons() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getNumButtons(this.fileHandle.fd);
+	// }
+	// public getDeviceName() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getDeviceName(this.fileHandle.fd);
+	// }
+	// public getAxisMap() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getAxisMap(this.fileHandle.fd);
+	// }
+	// public getButtonMap() {
+	// 	if (!this.fileHandle) {
+	// 		throw new Error('File handle not initialized');
+	// 	}
+	// 	return getButtonMap(this.fileHandle.fd);
+	// }
 }
