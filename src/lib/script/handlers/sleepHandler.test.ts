@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { msSleepHandler } from './sleepHandler';
 import { delay } from '$lib/utils/delay';
 
@@ -6,6 +6,9 @@ import { delay } from '$lib/utils/delay';
 vi.mock('$lib/utils/delay', () => ({
     delay: vi.fn(),
 }));
+beforeEach(() => {
+    vi.resetAllMocks();
+});
 
 describe('sleepHandler', () => {
     it('should call delay with the correct time', async () => {
@@ -26,6 +29,6 @@ describe('sleepHandler', () => {
         const args: string[] = [];
         const handlerName = 'testHandler';
         await msSleepHandler(args, handlerName);
-        expect(delay).toHaveBeenCalledWith(NaN);
+        expect(delay).toBeCalledTimes(0);
     });
 });

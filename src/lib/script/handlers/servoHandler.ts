@@ -33,6 +33,7 @@ export class ServoHandler implements Handler {
         const angle = open ? servo.max : servo.min;
         if (args.length === 3) {
             const duration = parseInt(args[2]);
+            console.log(servo.channel, angle, duration);
             this.servoController.setAngleSlow(servo.channel, angle, duration);
             return;
         }
