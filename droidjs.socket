@@ -1,7 +1,0 @@
-# Install to /etc/systemd/system/droidjs.socket
-
-# [Socket]
-# ListenStream=80
-
-# [Install]
-# WantedBy=sockets.target
