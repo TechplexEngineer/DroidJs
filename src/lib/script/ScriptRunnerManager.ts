@@ -23,7 +23,7 @@ export class ScriptRunnerManager {
     }
 
     async getScript(scriptName: string) {
-        const scriptPath = `${this.scriptDirectory}/${scriptName}.scr`;
+        const scriptPath = `${this.scriptDirectory}/${scriptName}`;
         try {
             const scriptContent = await fs.readFile(scriptPath, 'utf-8');
             return scriptContent;
@@ -34,7 +34,7 @@ export class ScriptRunnerManager {
     }
 
     async updateScript(scriptName: string, script: string) {
-        const scriptPath = `${this.scriptDirectory}/${scriptName}.scr`;
+        const scriptPath = `${this.scriptDirectory}/${scriptName}`;
         try {
             await fs.writeFile(scriptPath, script, 'utf-8');
             console.log(`Script ${scriptName} updated successfully.`);
@@ -56,7 +56,7 @@ export class ScriptRunnerManager {
 
     async listScripts() {
         const listing = await fs.readdir(this.scriptDirectory, { recursive: true });
-        return listing.filter((file) => file.endsWith('.scr'))
-            .map(file => file.slice(0, file.lastIndexOf(".scr")));
+        return listing; //.filter((file) => file.endsWith('.scr'))
+            // .map(file => file.slice(0, file.lastIndexOf(".scr")));
     }
 }

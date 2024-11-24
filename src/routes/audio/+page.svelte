@@ -84,7 +84,7 @@
 			method="POST"
 			action="?/play"
 			use:enhance={getEnhanceFn(
-				'Playing...4',
+				'Playing...',
 				(result) => {
 					const msg = `Played: ${result.data.message}`;
 					console.log(msg);

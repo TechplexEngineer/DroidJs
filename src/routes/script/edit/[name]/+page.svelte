@@ -8,33 +8,35 @@
 	import { enhance } from '$app/forms';
 	import toast from 'svelte-french-toast';
 	import type { Action } from 'svelte/action';
+	import ActionButtonToast from '$lib/components/ActionButtonToast.svelte';
 
-	//@todo use action
-	const myEnhance: Action<HTMLFormElement, { loading: string; success: string; error: string }> = (
-		formElement,
-		{ loading, success, error }
-	) => {
-		return enhance(formElement, () => {
-			let doneHandler;
-			toast.promise(
-				new Promise((resolve, reject) => {
-					doneHandler = async ({ result }) => {
-						if (Math.floor(result.status / 100) == 2) resolve('');
-						else {
-							reject();
-						}
-					};
-				}),
-				{
-					loading,
-					success,
-					error
-				}
-			);
+	// @todo use action
+	// const myEnhance: Action<HTMLFormElement, { loading: string; success: string; error: string }> = (
+	// 	formElement,
+	// 	{ loading, success, error }
+	// ) => {
+	// 	return enhance(formElement, () => {
+	// 		let doneHandler;
+	// 		toast.promise(
+	// 			new Promise((resolve, reject) => {
+	// 				doneHandler = async ({ result }) => {
+	// 					if (Math.floor(result.status / 100) == 2) resolve('');
+	// 					else {
+	// 						reject();
+	// 					}
+	// 				};
+	// 			}),
+	// 			{
+	// 				loading,
+	// 				success,
+	// 				error
+	// 			}
+	// 		);
 
-			return doneHandler;
-		});
-	};
+	// 		return doneHandler;
+	// 	});
+	// };
+
 </script>
 
 <svelte:head>
@@ -45,27 +47,49 @@
 	/>
 </svelte:head>
 
-<form
-	method="POST"
-	use:myEnhance={{
-		loading: 'Saving...',
-		success: 'Script Saved',
-		error: 'Unable to save changes'
-	}}
->
-	<PageHeader title={`Edit Script '${$page.params.name}'`}>
-		<div>
-			<button formaction="?/save" class="btn btn-primary" type="submit">Save</button>
+<div class="container">
+	<!-- <form
+		method="POST"
+		use:myEnhance={{
+			loading: 'Saving...',
+			success: 'Script Saved',
+			error: 'Unable to save changes'
+		}}
+	> -->
+		<PageHeader title={`Edit Script '${$page.params.name}'`}>
+			<div class="d-flex">
+				<ActionButtonToast
+					action="?/save"
+					loading="Saving..."
+					success="Script Saved"
+					error="Unable to save changes"
+					actionLabel="Save"
+					btnClass="btn-primary">
+					<input type="hidden" name="script" bind:value={data.script}>
+				</ActionButtonToast>
+				<ActionButtonToast
+					action="/script?/run"
+					loading="Running..."
+					success="Script Finshed!"
+					error="Could not run script"
+					actionLabel="Run"
+					btnClass="ms-2 btn-outline-success">
+					<input type="hidden" name="filename" value={$page.params.name}>
+				</ActionButtonToast>
+				<!-- <button formaction="?/save" class="btn btn-primary" type="submit">Save</button> -->
 
-			<!-- <button formaction="?/run" class="btn btn-success" type="submit">Run</button> -->
-		</div>
-	</PageHeader>
+				<!-- <button formaction="/script?/run" class="btn btn-outline-success" type="submit" title="Run's the last saved version of the script">Run</button> -->
+				<!-- <input type="hidden" name="filename" value={$page.params.name}> -->
+			</div>
+		</PageHeader>
 
-	<textarea class="form-control" bind:value={data.script} name="script" />
-</form>
+		<textarea class="form-control" bind:value={data.script} name="script"/>
+	<!-- </form> -->
+</div>
 
 <style>
 	textarea {
+		height: 500px;
 		min-height: 500px;
 	}
 </style>

@@ -7,6 +7,7 @@
 	export let data;
 
 	const value = source(`/controller/${$page.params.jsid}`).select('message');
+	// const heartbeat = source(`/controller/${$page.params.jsid}`).select('heartbeat');
 
 	let messages: string[] = [];
 
@@ -19,6 +20,8 @@
 
 	$: appendValue($value);
 	const controller = data.joysticks.find((j) => `js${j.number}` == $page.params.jsid);
+
+	// $: console.log($heartbeat)
 </script>
 
 <div class="container-fluid">

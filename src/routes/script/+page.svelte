@@ -35,10 +35,19 @@
 		<div class="d-flex align-items-center">
 			<div class="flex-grow-1">{file}</div>
 			<a href="{$page.route.id}/edit/{file}" class="btn btn-outline-secondary">Edit</a>
-			<form action="?/run" method="POST" use:enhance>
+			<ActionButton
+				action="?/run"
+				loading="Running..."
+				success="Script Finshed!"
+				error="Could not run script"
+				actionLabel="Run"
+				btnClass="ms-2 btn-outline-primary">
+				<input type="hidden" name="filename" value={file} />
+			</ActionButton>
+			<!-- <form action="?/run" method="POST" use:enhance>
 				<input type="hidden" name="filename" value={file} />
 				<button class="btn btn-outline-primary ms-2">Run</button>
-			</form>
+			</form> -->
 		</div>
 
 		<!-- <a href="{$page.route.id}/edit/{file}" class="stretched-link text-reset text-decoration-none">

@@ -7,6 +7,7 @@ export const load = (async ({ locals, params }) => {
     };
 }) satisfies PageServerLoad;
 
+
 export const actions = {
     save: async ({ locals, request, params }) => {
         const data = await request.formData();
