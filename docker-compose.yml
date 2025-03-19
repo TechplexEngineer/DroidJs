@@ -1,0 +1,21 @@
+version: '2'
+
+volumes:
+  database:
+
+services:
+  heatpi:
+    restart: always
+    build:
+      context: "."
+    network_mode: host
+    ports:
+      - "80"
+    environment:
+      PORT: "80"
+      DBUS_SYSTEM_BUS_ADDRESS: 'unix:path=/host/run/dbus/system_bus_socket'
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+    labels:
+      io.balena.features.supervisor-api: 1
+      io.balena.features.dbus: '1'
