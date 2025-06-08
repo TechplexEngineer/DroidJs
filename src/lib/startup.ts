@@ -22,7 +22,7 @@ console.log('Is Raspberry Pi:', isRaspberryPi);
 
 
 const deadband = 0.01;
-const maxSpeed = 0.5;
+const maxSpeed = 0.75;
 const domeMaxSpeed = .2;
 
 const PortMapping = {
@@ -176,7 +176,7 @@ export const startup = async (): Promise<App.Locals> => {
 	await pcaDome.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
 	const servoDome = new ServoController(pcaDome);
 
-	
+
 	const astropixels = new Astropixels(con);
 
 	let soundDirPath = "./sounds";
@@ -187,14 +187,14 @@ export const startup = async (): Promise<App.Locals> => {
 
 	const player = new SoundPlayer(soundDirPath)
 
-	
+
 	// at startup set all servos to home pos
 	const servos = await configDb.getServos();
 
 	for (const { hardware, channel, home } of servos) {
-		if (hardware == "Dome Servos"){
+		if (hardware == "Dome Servos") {
 			servoDome.setAngle(channel, home ?? 0);
-		} else if (hardware == "Body Servos"){
+		} else if (hardware == "Body Servos") {
 			console.log()
 			// servoBody.setAngle(channel, home ?? 0);
 		} else {
@@ -249,7 +249,7 @@ export const startup = async (): Promise<App.Locals> => {
 	}
 };
 
-const initHardware = (configDb: ConfigDb):Record<string, any> => {
+const initHardware = (configDb: ConfigDb): Record<string, any> => {
 
 	return {};
 }
