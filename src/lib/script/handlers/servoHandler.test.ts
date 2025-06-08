@@ -39,11 +39,11 @@ describe('ServoHandler', () => {
         servoHandler = new ServoHandler(servoController, configDb);
     });
 
-    it('should set the angle of the servo correctly', async () => {
-        const args = ['PP1', '90'];
+    it('should set the angle of the servo based on the configured max', async () => {
+        const args = ['PP1', '1'];
         const handlerName = 'testHandler';
         await servoHandler.handler(args, handlerName);
-        expect(servoController.setAngle).toHaveBeenCalledWith(6, 90);
+        expect(servoController.setAngle).toHaveBeenCalledWith(6, 115);
     });
 
     it('should log an error if args length is not 2', async () => {
@@ -71,9 +71,9 @@ describe('ServoHandler', () => {
     });
 
     it('should handle a third argument which is the duration of the move', async () => {
-        const args = ['PP1', '90', '1000'];
+        const args = ['PP1', '1', '1000'];
         const handlerName = 'testHandler';
         await servoHandler.handler(args, handlerName);
-        expect(servoController.setAngleSlow).toHaveBeenCalledWith(6, 90, 1000);
+        expect(servoController.setAngleSlow).toHaveBeenCalledWith(6, 115, 1000);
     });
 });

@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import uFuzzy from '@leeoniya/ufuzzy';
 	import type { PageData } from './$types';
+	import { debounce } from '$lib/utils/debounce';
+	import toast from 'svelte-french-toast';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import ActionButton from '$lib/components/ActionButtonToast.svelte';
+	import SearchableGridLayout from '$lib/components/SearchableGridLayout.svelte';
+	import { page } from '$app/stores';
 
 	export let data: PageData;
 </script>
@@ -12,16 +19,38 @@
 		content="Scripts to animate your droids motion with DroidJs Droid Control Software"
 	/>
 </svelte:head>
-<h1>Script Library</h1>
+<div class="container">
+	<PageHeader title="Script Library">
+		<ActionButton
+			action="?/stop"
+			loading="Stopping..."
+			success="All scripts stopped!"
+			error="Could not stop scripts"
+			actionLabel="Stop All"
+			btnClass="btn-warning"
+		/>
+	</PageHeader>
 
-{#each data.files as file}
-	<ul>
-		<li>
-			<form method="POST" action="?/run" use:enhance>
-				{file}
+	<SearchableGridLayout items={data.files} let:file>
+		<div class="d-flex align-items-center">
+			<div class="flex-grow-1">{file}</div>
+			<a href="{$page.route.id}/edit/{file}" class="btn btn-outline-secondary">Edit</a>
+			<ActionButton
+				action="?/run"
+				loading="Running..."
+				success="Script Finshed!"
+				error="Could not run script"
+				actionLabel="Run"
+				btnClass="ms-2 btn-outline-primary">
 				<input type="hidden" name="filename" value={file} />
-				<button type="submit" class="btn btn-outline-primary">Run</button>
-			</form>
-		</li>
-	</ul>
-{/each}
+			</ActionButton>
+			<!-- <form action="?/run" method="POST" use:enhance>
+				<input type="hidden" name="filename" value={file} />
+				<button class="btn btn-outline-primary ms-2">Run</button>
+			</form> -->
+		</div>
+
+		<!-- <a href="{$page.route.id}/edit/{file}" class="stretched-link text-reset text-decoration-none">
+		</a> -->
+	</SearchableGridLayout>
+</div>

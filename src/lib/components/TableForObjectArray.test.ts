@@ -1,13 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import TableForObjectArray, { type TableColumnOrStr } from './TableForObjectArray.svelte';
+import '@testing-library/jest-dom/vitest'
 
 const sampleData = [{ name: 'Alice', age: '25' }];
 
 describe('TableForObjectArray', () => {
+	beforeEach(() => {
+		document.getElementsByTagName('html')[0].innerHTML = '';
+	});
+
 	it('renders columns without explicit list', () => {
 		render(TableForObjectArray, { data: sampleData });
-		// screen.debug();
+		screen.debug();
+		console.log(screen.queryByText('Name'))
 		expect(screen.queryByText('Name')).toBeVisible();
 		expect(screen.queryByText('Age')).toBeVisible();
 	});
@@ -18,6 +24,7 @@ describe('TableForObjectArray', () => {
 			{ data: 'age', title: 'Age' }
 		];
 		render(TableForObjectArray, { data: sampleData, columns: columns });
+		screen.debug();
 		expect(screen.queryByText('Name')).toBeVisible();
 		expect(screen.queryByText('Age')).toBeVisible();
 	});

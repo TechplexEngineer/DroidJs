@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { groupSounds } from './player';
+import { groupSounds } from './groupSounds';
 
 
-describe('groupSounds', () => {
+describe('groupSounds', () => {``
     it('should group sounds by top-level directory', async () => {
         const sounds = [
             'SENT/SENT_001.mp3',

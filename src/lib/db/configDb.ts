@@ -18,8 +18,9 @@ export type ActionInput = {
     buttonOrAxisName: string,
     comboKey?: string,
     axisValue?: number,
-    type?: string // only 'sound' supported now
+    type?: string // only 'sound' or 'script' supported now
     category?: string // only supported when type is 'sound'
+    name?: string // only supported when type is 'script'
 }
 
 export type ControllerMap = Record<Action, ActionInput>;

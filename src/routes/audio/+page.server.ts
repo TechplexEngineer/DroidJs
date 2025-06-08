@@ -1,8 +1,17 @@
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
+    const soundFiles = await locals.soundPlayer.listSounds();
+    let data: Record<string, number> = {};
+    // console.time("getLength");
+    // for await (const file of soundFiles) {
+    //     data[file] = locals.soundPlayer.getSoundLength(file);
+    // }
+    // console.timeEnd("getLength") //14sec
     return {
-        files: await locals.soundPlayer.listSounds(),
+        files: soundFiles,
+        filesWithTime: data,
         volume: locals.soundPlayer.getVolume()
     };
 }) satisfies PageServerLoad;
@@ -15,7 +24,8 @@ export const actions = {
         if (!filename) {
             return;
         }
-        locals.soundPlayer.playSound(filename);
+        await locals.soundPlayer.playSound(filename);
+        return { message: filename };
     },
     stop: async ({ locals, request }) => {
         console.log('stop');
@@ -28,5 +38,13 @@ export const actions = {
             return;
         }
         locals.soundPlayer.setVolume(parseInt(volume));
+    },
+    playRandom: async ({ locals, request }) => {
+        const data = await request.formData();
+        const cagegory = data.get('category')?.toString();
+        if (!cagegory) {
+            return fail(400, { message: "category is required" });
+        }
+        return { message: await locals.soundPlayer.playRandomSound(cagegory) };
     }
 } satisfies Actions;

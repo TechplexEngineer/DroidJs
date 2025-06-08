@@ -10,7 +10,6 @@ import { PwmMotorController } from './motion/pwmMotor';
 import { ServoController } from './motion/servoController';
 import { SoundPlayer } from './sound/player';
 import { applyDeadband, mapRange } from './utils/math';
-import { browser, building, dev, version } from '$app/environment';
 import os from 'os';
 import { ScriptRunnerManager } from './script/ScriptRunnerManager';
 import { SoundHandler } from './script/handlers/soundHandler';
@@ -31,17 +30,18 @@ const PortMapping = {
 	dome: 3,
 }
 
-if (import.meta.hot) {
-	console.log('Hot reload enabled');
-	import.meta.hot.accept(() => {
-		console.log('reload!');
-	});
-}
 let controllerMapCache: ControllerMap | null = null;
 
 let driveIntervalHandle: NodeJS.Timeout | null = null;
 
-export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, controllerMapCache: ControllerMap, player: SoundPlayer, motor: PwmMotorController) => {
+export const setupEventHandlers = async (
+	js: JoystickCache,
+	configDb: ConfigDb,
+	controllerMapCache: ControllerMap,
+	player: SoundPlayer,
+	motor: PwmMotorController,
+	scriptMgr: ScriptRunnerManager
+) => {
 	console.log('setupEventHandlers');
 	js.removeAllListeners();
 	if (driveIntervalHandle) {
@@ -85,7 +85,7 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 		if (ev.value !== 1) return; // only when button pressed
 
 		controllerMapCache = await configDb.getControllerMap();
-		await setupEventHandlers(js, configDb, controllerMapCache, player, motor);
+		await setupEventHandlers(js, configDb, controllerMapCache, player, motor, scriptMgr);
 		console.log('Controller map reloaded:', controllerMapCache);
 	});
 
@@ -126,6 +126,21 @@ export const setupEventHandlers = async (js: JoystickCache, configDb: ConfigDb, 
 				await player.playRandomSound(value.category || null);
 			});
 		}
+	}
+
+	for (const [_key, value] of Object.entries(controllerMapCache).filter(([key, value]) => value.type == "script")) {
+		console.log('Setting up script event:', value);
+
+		const scriptName = value.name;
+		if (!scriptName) {
+			return;
+		}
+		js.on(value.buttonOrAxisName, async (ev) => {
+			if (ev.value !== 1) { // only when button pressed, not released
+				return;
+			}
+			await scriptMgr.runScript(scriptName);
+		});
 	}
 };
 
@@ -171,6 +186,13 @@ export const startup = async (): Promise<App.Locals> => {
 	const motorBody = new PwmMotorController(pcaBody);
 	// const servoBody = new ServoController(pcaBody);
 
+	if (!isRaspberryPi) {
+		// lets mock out setAngle and log what gets set
+		servoBody.setAngle = (channel: number, targetAngle: number, allowOutOfBounds = false) => {
+			console.log('Servo setAngle:', channel, targetAngle);
+		}
+	}
+
 	const pcaDome = new PCA9685(con, 0x41);
 	await pcaDome.init();
 	await pcaDome.setPWMFreq(50); //should be 50 per spark datasheet, 60 does not work
@@ -195,8 +217,7 @@ export const startup = async (): Promise<App.Locals> => {
 		if (hardware == "Dome Servos") {
 			servoDome.setAngle(channel, home ?? 0);
 		} else if (hardware == "Body Servos") {
-			console.log()
-			// servoBody.setAngle(channel, home ?? 0);
+			servoBody.setAngle(channel, home ?? 0);
 		} else {
 			console.log('Unknown servo hardware:', hardware);
 		}
@@ -237,7 +258,7 @@ export const startup = async (): Promise<App.Locals> => {
 		console.log('update', JSON.stringify(ev));
 	});
 
-	setupEventHandlers(js, configDb, controllerMapCache, player, motorBody);
+	setupEventHandlers(js, configDb, controllerMapCache, player, motorBody, scriptMgr);
 
 
 	return {
